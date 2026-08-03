@@ -1,0 +1,14 @@
+# Secrets
+.env
+client_secret_*.json
+
+# Python
+__pycache__/
+*.pyc
+
+# Pipeline outputs
+crowd_output/
+
+# OS
+.DS_Store
+Thumbs.db
