@@ -1,0 +1,23 @@
+=== delhi-chandni-chowk :: Chandni Chowk Delhi aerial drone view crowd :: 2026-10-09 04:02:17 ===
+[stage1] searching for 'Chandni Chowk Delhi aerial drone view crowd' (max 6, order=relevance)
+[stage1] found 6 video ids, fetching details
+[stage1] dropped 4 outside [30s, 3600s]
+[stage1] vantage filter (drop-ground): kept 2/2
+[stage1] done — 2 videos → discovery.json
+  ^ ohB8A4dbxZM  (  3.0m,      3,923 views)  Mass of crowded housing in Chandni Chowk, Old Delhi: Aer
+  ^ H80FzE9iXBI  (  2.2m,         31 views)  Best Places to Visit in Delhi 4K Drone Videos with All D
+[stage2] probing https://www.youtube.com/watch?v=ohB8A4dbxZM
+[stage2] downloading ohB8A4dbxZM
+[stage2] ohB8A4dbxZM: extracting frames at 1.0 fps → crowd_output_india\delhi-chandni-chowk\ohB8A4dbxZM\frames
+[stage2] ohB8A4dbxZM: 177 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=H80FzE9iXBI
+[stage2] downloading H80FzE9iXBI
+ERROR: unable to download video data: HTTP Error 403: Forbidden
+[stage2] skipping https://www.youtube.com/watch?v=H80FzE9iXBI — ERROR: unable to download video data: HTTP Error 403: Forbidden
+[stage2] done — 1/2 videos prepared
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] ohB8A4dbxZM: scoring 177 frames
+[stage3] ohB8A4dbxZM: 177/177 candidates (0% reduction)
+[stage3] batch done — 177/177 frames pass (0% reduction)
+[stage4] ohB8A4dbxZM: scoring 177 frames at 15 RPM
+  [stage4] 10/177 scored

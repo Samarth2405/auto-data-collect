@@ -168,6 +168,7 @@ yes ──▶ return               write .stage2_done
 - **`.stage2_done` sentinel.** An interrupted FFmpeg leaves partial frames on disk. Without a sentinel, the cache-check would see frames and lie. The empty sentinel file guarantees "if `.stage2_done` exists, the extraction completed."
 - **`-c copy` not used here.** FFmpeg re-encodes to JPEG — needed for the width-1280 rescale.
 - **1280 px width, 1 fps.** Empirically good enough for crowd density; keeps JPEGs at ~50–100 KB for fast Gemini upload.
+- **720p download cap (`MAX_HEIGHT`).** Every format alternative in the yt-dlp chain is height-capped, with `format_sort: ["res:720"]` holding the last-resort `best` down too — an uncapped tail would let any upload lacking an m4a audio stream fall through to 4K. Since frames are rescaled to 1280 px and YOLO sees 640 px, the extra pixels buy nothing: a 30-minute upload is ~5.7 GB at 2160p versus ~0.7 GB at 720p.
 - **Graceful failure.** Private or geo-blocked videos log a warning and return `None`. The batch continues.
 
 ---
@@ -238,7 +239,7 @@ Typically **60–80% frame reduction** before Gemini. A 3-minute video at 1 fps 
 
 #### What it does
 
-Sends each candidate frame to Gemini 2.5 Flash with a structured prompt. Gets back a JSON object with `score` (1–10) and one-sentence `reasoning`.
+Sends each candidate frame to Gemini 3.5 Flash with a structured prompt. Gets back a JSON object with `score` (1–10), a `vantage` (`ground` / `elevated` / `aerial` / `unknown`, judged from geometry — viewing angle, sky visible, tops of heads — independent of how close the crowd is) and one-sentence `reasoning`. Stage 6 uses the vantage to keep only elevated footage, so the gate stays cached and retunable for free.
 
 #### Why Gemini, not just YOLO's count
 
@@ -261,7 +262,7 @@ frame_path
    ▼
 read bytes ── image/jpeg part ────────┐
                                        │
-prompt: "Rate the crowd density..." ──┼──▶ Gemini 2.5 Flash
+prompt: "Rate the crowd density..." ──┼──▶ Gemini 3.5 Flash
                                        │    (response_schema=CrowdScoreResponse)
                                        │
                                        ▼
@@ -286,7 +287,10 @@ prompt: "Rate the crowd density..." ──┼──▶ Gemini 2.5 Flash
 
 - **Structured output via Pydantic schema.** Gemini's `response_schema=CrowdScoreResponse` guarantees a typed response — no regex parsing, no malformed-JSON bugs.
 - **Rate-limited to 15 RPM by default.** Simple time-spacing (4 s between calls) matches free tier. Configurable via `--rpm` if you're on a paid tier.
-- **Exponential backoff on 429/5xx.** 5 attempts, 1s → 16s. Handles transient failures without cascading a full-batch failure.
+- **Optional concurrency (`--workers`, default 1).** A call takes ~2 s, so a sequential loop cannot exceed ~30 RPM whatever `--rpm` says. With `--workers N`, a thread pool scores one video's frames at once while a lock-guarded limiter keeps the *global* call spacing at `60/rpm`. Results are re-sorted by timestamp, so output is identical to a sequential run. On quota exhaustion or a per-video error, queued frames are cancelled and in-flight ones still bank to the cache.
+- **Exponential backoff on *transient* 429/5xx.** 5 attempts, 1s → 16s. Handles per-minute rate limits and blips without cascading a full-batch failure.
+- **Terminal errors bail immediately (`_is_terminal`).** A spend cap, daily quota, suspended consumer or bad API key will not fix itself, so retrying burns 5 attempts × every remaining frame for nothing. These raise `QuotaExhausted` on the first attempt instead.
+- **Two failure scopes, two behaviors.** A per-video fault (corrupt frame, unexpected error) checkpoints what scored, returns `None`, and the batch carries on without that video — the same convention Stage 2 uses. `QuotaExhausted` is account-wide, so `run_stage4` ends the batch, returns the videos that finished, and reports how many were left unscored. Either way the partial `gemini_scores.json` survives, so a rerun resumes frame-by-frame rather than restarting the video.
 - **`resp.parsed is None` handled.** Safety-blocked or malformed responses would normally crash `.score`. We return a floor-score sentinel (score=1, reasoning=`"no parsed response (finish=...)"`), so the frame drops out of the high-density set without stopping the pipeline.
 - **Score clamped to [1, 10] post-parse.** Belt-and-suspenders against a rogue model response.
 - **Incremental cache saves.** Every 10 frames, the full scores JSON is rewritten. Ctrl-C in the middle of an hour-long batch loses at most 10 frames' worth of work.

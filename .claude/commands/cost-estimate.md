@@ -35,7 +35,7 @@ If $ARGUMENTS is empty, ask the user to provide at least one YouTube URL before 
    - `time_at_15rpm = total_calls / 15` minutes  ← free-tier
    - `time_at_60rpm = total_calls / 60` minutes  ← paid-tier
    - Cost (paid tier only, approximate): `total_calls × $0.0009`
-     [~$0.36 per 400 frames based on Gemini 2.5 Flash pricing — verify current rates]
+     [~$0.36 per 400 frames based on Gemini 2.5 Flash pricing — stale: re-check rates for Gemini 3.5 Flash]
 
 4. **Print a table:**
 

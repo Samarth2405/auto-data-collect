@@ -12,3 +12,10 @@ crowd_output/
 # OS
 .DS_Store
 Thumbs.db
+
+# Large local artifacts: downloads, datasets, archives (GitHub rejects >100 MB files)
+*.zip
+crowd_output*/
+dataset/
+dataset-*/
+.venv/

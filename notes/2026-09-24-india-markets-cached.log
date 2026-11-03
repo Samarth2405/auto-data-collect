@@ -1,0 +1,166 @@
+=== chandni_chowk :: 4 videos :: 2026-09-24 07:32:55 ===
+[stage2] FYtM7iLOEUA: cached (offline) — 2450 frames
+[stage2] 43mgupCjLCc: cached (offline) — 1794 frames
+[stage2] 3pfa_9kQJU8: cached (offline) — 1693 frames
+[stage2] otSdfB8hOm8: cached (offline) — 1619 frames
+[stage2] done — 4/4 videos prepared
+[stage3] FYtM7iLOEUA: cached prefilter reused (threshold=5)
+[stage3] FYtM7iLOEUA: 1104/2450 candidates (55% reduction)
+[stage3] 43mgupCjLCc: cached prefilter reused (threshold=5)
+[stage3] 43mgupCjLCc: 1744/1794 candidates (3% reduction)
+[stage3] 3pfa_9kQJU8: cached prefilter reused (threshold=5)
+[stage3] 3pfa_9kQJU8: 1628/1693 candidates (4% reduction)
+[stage3] otSdfB8hOm8: cached prefilter reused (threshold=5)
+[stage3] otSdfB8hOm8: 1547/1619 candidates (4% reduction)
+[stage3] batch done — 6023/7556 frames pass (20% reduction)
+[stage4] FYtM7iLOEUA: 670 cached, 434 new
+[stage4] FYtM7iLOEUA: scoring 434 frames at 15 RPM
+  [stage4] retry 1/5 in 1s: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+  [stage4] retry 2/5 in 2s: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+  [stage4] retry 3/5 in 4s: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+  [stage4] retry 4/5 in 8s: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+Traceback (most recent call last):
+  File "C:\Users\samar\Documents\crowd_dataset_algo\stage8_output.py", line 186, in <module>
+    scored = run_stage4(prefiltered, rpm=args.rpm)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\Documents\crowd_dataset_algo\stage4_gemini_score.py", line 226, in run_stage4
+    results = [score_video(pv, rpm) for pv in prefiltered_videos]
+               ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\Documents\crowd_dataset_algo\stage4_gemini_score.py", line 199, in score_video
+    parsed = _score_frame(frame.path, rpm)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\Documents\crowd_dataset_algo\stage4_gemini_score.py", line 107, in _score_frame
+    resp = client.models.generate_content(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\models.py", line 6331, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\models.py", line 4767, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\_api_client.py", line 1605, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\_api_client.py", line 1398, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\anaconda3\Lib\site-packages\tenacity\__init__.py", line 379, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\anaconda3\Lib\site-packages\tenacity\__init__.py", line 325, in iter
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\anaconda3\Lib\site-packages\tenacity\__init__.py", line 158, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\anaconda3\Lib\concurrent\futures\_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\anaconda3\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\ProgramData\anaconda3\Lib\site-packages\tenacity\__init__.py", line 382, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\_api_client.py", line 1375, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\errors.py", line 155, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\errors.py", line 184, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+--- chandni_chowk exit=1 at 2026-09-24 07:33:26 ---
+=== sarojini_nagar :: 2 videos :: 2026-09-24 07:33:26 ===
+[stage2] ri34yUyx18w: cached (offline) — 477 frames
+[stage2] sNnT5ouqaAg: cached (offline) — 365 frames
+[stage2] done — 2/2 videos prepared
+[stage3] ri34yUyx18w: cached prefilter reused (threshold=5)
+[stage3] ri34yUyx18w: 27/477 candidates (94% reduction)
+[stage3] sNnT5ouqaAg: cached prefilter reused (threshold=5)
+[stage3] sNnT5ouqaAg: 168/365 candidates (54% reduction)
+[stage3] batch done — 195/842 frames pass (77% reduction)
+[stage4] ri34yUyx18w: 27 cached, 0 new
+[stage4] ri34yUyx18w: 11/27 high-density (score >= 7)
+[stage4] sNnT5ouqaAg: 168 cached, 0 new
+[stage4] sNnT5ouqaAg: 120/168 high-density (score >= 7)
+[stage4] batch done — 131/195 frames marked high-density
+[stage6] ri34yUyx18w: 6 segments, peak score 7, 11s of crowd (threshold=7)
+[stage6] sNnT5ouqaAg: 15 segments, peak score 10, 131s of crowd (threshold=7)
+[stage6] batch done — 21 segments across 2 videos
+[stage8] wrote results.json + segments.csv — 21 segments across 2 videos
+
+[stage8] artifacts:
+  json: crowd_output_india\sarojini_nagar\results.json
+  csv: crowd_output_india\sarojini_nagar\segments.csv
+--- sarojini_nagar exit=0 at 2026-09-24 07:33:38 ---
+=== crawford_market :: 4 videos :: 2026-09-24 07:33:39 ===
+[stage2] DAKWoAhJLDw: cached (offline) — 1463 frames
+[stage2] u_Ia89AhS-0: cached (offline) — 802 frames
+[stage2] WtvD_a3JTlM: cached (offline) — 368 frames
+[stage2] q-Q2HgEfeAo: cached (offline) — 1293 frames
+[stage2] done — 4/4 videos prepared
+[stage3] DAKWoAhJLDw: cached prefilter reused (threshold=5)
+[stage3] DAKWoAhJLDw: 1116/1463 candidates (24% reduction)
+[stage3] u_Ia89AhS-0: cached prefilter reused (threshold=5)
+[stage3] u_Ia89AhS-0: 397/802 candidates (50% reduction)
+[stage3] WtvD_a3JTlM: cached prefilter reused (threshold=5)
+[stage3] WtvD_a3JTlM: 158/368 candidates (57% reduction)
+[stage3] q-Q2HgEfeAo: cached prefilter reused (threshold=5)
+[stage3] q-Q2HgEfeAo: 786/1293 candidates (39% reduction)
+[stage3] batch done — 2457/3926 frames pass (37% reduction)
+[stage4] DAKWoAhJLDw: 750 cached, 366 new
+[stage4] DAKWoAhJLDw: scoring 366 frames at 15 RPM
+  [stage4] retry 1/5 in 1s: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+  [stage4] retry 2/5 in 2s: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+  [stage4] retry 3/5 in 4s: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+  [stage4] retry 4/5 in 8s: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+Traceback (most recent call last):
+  File "C:\Users\samar\Documents\crowd_dataset_algo\stage8_output.py", line 186, in <module>
+    scored = run_stage4(prefiltered, rpm=args.rpm)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\Documents\crowd_dataset_algo\stage4_gemini_score.py", line 226, in run_stage4
+    results = [score_video(pv, rpm) for pv in prefiltered_videos]
+               ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\Documents\crowd_dataset_algo\stage4_gemini_score.py", line 199, in score_video
+    parsed = _score_frame(frame.path, rpm)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\Documents\crowd_dataset_algo\stage4_gemini_score.py", line 107, in _score_frame
+    resp = client.models.generate_content(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\models.py", line 6331, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\models.py", line 4767, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\_api_client.py", line 1605, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\_api_client.py", line 1398, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\anaconda3\Lib\site-packages\tenacity\__init__.py", line 379, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\anaconda3\Lib\site-packages\tenacity\__init__.py", line 325, in iter
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\anaconda3\Lib\site-packages\tenacity\__init__.py", line 158, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\anaconda3\Lib\concurrent\futures\_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\anaconda3\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\ProgramData\anaconda3\Lib\site-packages\tenacity\__init__.py", line 382, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\_api_client.py", line 1375, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\errors.py", line 155, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File "C:\Users\samar\AppData\Roaming\Python\Python312\site-packages\google\genai\errors.py", line 184, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+--- crawford_market exit=1 at 2026-09-24 07:34:11 ---
+=== CACHED BATCH FINISHED 2026-09-24 07:34:11 ===

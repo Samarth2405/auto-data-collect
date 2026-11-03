@@ -1,0 +1,461 @@
+=== delhi-chandni-chowk :: Chandni Chowk Delhi aerial drone view crowd :: 2026-10-19 02:54:33 ===
+[stage1] searching for 'Chandni Chowk Delhi aerial drone view crowd' (max 6, order=relevance)
+[stage1] found 6 video ids, fetching details
+[stage1] dropped 2 outside [30s, 3600s]
+[stage1] vantage filter (drop-ground): kept 4/4
+[stage1] done — 4 videos → discovery.json
+  ? 0xRk4WMq7Ek  (  2.0m,     17,856 views)  Chandni Chowk 4K - Cinematic Video | Ankit Kumar | Shot 
+  ^ ohB8A4dbxZM  (  3.0m,      3,936 views)  Mass of crowded housing in Chandni Chowk, Old Delhi: Aer
+  ^ m-JIWt9DTYI  (  4.8m,         13 views)  Chandni Chowk Post lockdown newlook, दिल्ली की सैर
+  ? P29Rf4IlmRk  (  1.5m,        323 views)  𝐃𝐞𝐥𝐡𝐢 - 𝐓𝐡𝐞 𝐇𝐞𝐚𝐫𝐭 𝐨𝐟 𝐭𝐡𝐞 𝐍𝐚𝐭𝐢𝐨𝐧 !! 𝐂𝐢𝐧𝐞𝐦𝐚𝐭𝐢𝐜 𝐕𝐥𝐨𝐠 !! 𝐃𝐫𝐨
+[stage2] probing https://www.youtube.com/watch?v=0xRk4WMq7Ek
+[stage2] downloading 0xRk4WMq7Ek
+[stage2] 0xRk4WMq7Ek: extracting frames at 1.0 fps → crowd_output_india\delhi-chandni-chowk\0xRk4WMq7Ek\frames
+[stage2] 0xRk4WMq7Ek: 122 frames extracted
+[stage2] ohB8A4dbxZM: cached (offline) — 177 frames
+[stage2] probing https://www.youtube.com/watch?v=m-JIWt9DTYI
+[stage2] downloading m-JIWt9DTYI
+[stage2] m-JIWt9DTYI: extracting frames at 1.0 fps → crowd_output_india\delhi-chandni-chowk\m-JIWt9DTYI\frames
+[stage2] m-JIWt9DTYI: 286 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=P29Rf4IlmRk
+[stage2] downloading P29Rf4IlmRk
+[stage2] P29Rf4IlmRk: extracting frames at 1.0 fps → crowd_output_india\delhi-chandni-chowk\P29Rf4IlmRk\frames
+[stage2] P29Rf4IlmRk: 88 frames extracted
+[stage2] done — 4/4 videos prepared
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] 0xRk4WMq7Ek: scoring 122 frames
+[stage3] 0xRk4WMq7Ek: 122/122 candidates (0% reduction)
+[stage3] ohB8A4dbxZM: cached prefilter reused (threshold=0)
+[stage3] ohB8A4dbxZM: 177/177 candidates (0% reduction)
+[stage3] m-JIWt9DTYI: scoring 286 frames
+[stage3] m-JIWt9DTYI: 286/286 candidates (0% reduction)
+[stage3] P29Rf4IlmRk: scoring 88 frames
+[stage3] P29Rf4IlmRk: 88/88 candidates (0% reduction)
+[stage3] batch done — 673/673 frames pass (0% reduction)
+[stage4] 0xRk4WMq7Ek: scoring 122 frames at 15 RPM
+  [stage4] 10/122 scored
+  [stage4] 20/122 scored
+  [stage4] 30/122 scored
+  [stage4] 40/122 scored
+  [stage4] 50/122 scored
+  [stage4] 60/122 scored
+  [stage4] 70/122 scored
+  [stage4] 80/122 scored
+  [stage4] 90/122 scored
+  [stage4] 100/122 scored
+  [stage4] 110/122 scored
+  [stage4] 120/122 scored
+  [stage4] 122/122 scored
+[stage4] 0xRk4WMq7Ek: 15/122 high-density (score >= 7), 0 of those elevated
+[stage4] 0xRk4WMq7Ek: vantage mix — ground=100, unknown=17, elevated=5
+[stage4] ohB8A4dbxZM: 10 cached, 167 new
+[stage4] ohB8A4dbxZM: scoring 167 frames at 15 RPM
+  [stage4] 10/167 scored
+  [stage4] 20/167 scored
+  [stage4] 30/167 scored
+  [stage4] 40/167 scored
+  [stage4] 50/167 scored
+  [stage4] 60/167 scored
+  [stage4] 70/167 scored
+  [stage4] 80/167 scored
+  [stage4] 90/167 scored
+  [stage4] 100/167 scored
+  [stage4] 110/167 scored
+  [stage4] 120/167 scored
+  [stage4] 130/167 scored
+  [stage4] 140/167 scored
+  [stage4] 150/167 scored
+  [stage4] 160/167 scored
+  [stage4] 167/167 scored
+[stage4] ohB8A4dbxZM: 0/177 high-density (score >= 7), 0 of those elevated
+[stage4] ohB8A4dbxZM: vantage mix — aerial=173, unknown=4
+[stage4] m-JIWt9DTYI: scoring 286 frames at 15 RPM
+  [stage4] 10/286 scored
+  [stage4] 20/286 scored
+  [stage4] 30/286 scored
+  [stage4] 40/286 scored
+  [stage4] 50/286 scored
+  [stage4] 60/286 scored
+  [stage4] 70/286 scored
+  [stage4] 80/286 scored
+  [stage4] 90/286 scored
+  [stage4] 100/286 scored
+  [stage4] 110/286 scored
+  [stage4] 120/286 scored
+  [stage4] 130/286 scored
+  [stage4] 140/286 scored
+  [stage4] 150/286 scored
+  [stage4] 160/286 scored
+  [stage4] 170/286 scored
+  [stage4] 180/286 scored
+  [stage4] 190/286 scored
+  [stage4] 200/286 scored
+  [stage4] 210/286 scored
+  [stage4] 220/286 scored
+  [stage4] 230/286 scored
+  [stage4] 240/286 scored
+  [stage4] 250/286 scored
+  [stage4] 260/286 scored
+  [stage4] 270/286 scored
+  [stage4] 280/286 scored
+  [stage4] 286/286 scored
+[stage4] m-JIWt9DTYI: 45/286 high-density (score >= 7), 0 of those elevated
+[stage4] m-JIWt9DTYI: vantage mix — ground=247, elevated=39
+[stage4] P29Rf4IlmRk: scoring 88 frames at 15 RPM
+  [stage4] 10/88 scored
+  [stage4] 20/88 scored
+  [stage4] 30/88 scored
+  [stage4] 40/88 scored
+  [stage4] 50/88 scored
+  [stage4] 60/88 scored
+  [stage4] 70/88 scored
+  [stage4] 80/88 scored
+  [stage4] 88/88 scored
+[stage4] P29Rf4IlmRk: 0/88 high-density (score >= 7), 0 of those elevated
+[stage4] P29Rf4IlmRk: vantage mix — ground=78, elevated=6, unknown=4
+[stage4] batch done — 60/673 frames high-density, 0 high-density AND elevated, across 4/4 videos
+[stage6] 0xRk4WMq7Ek: vantage gate kept 0/15 high-density frames (elevated only)
+[stage6] 0xRk4WMq7Ek: no segments at threshold=7
+[stage6] ohB8A4dbxZM: no segments at threshold=7
+[stage6] m-JIWt9DTYI: vantage gate kept 0/45 high-density frames (elevated only)
+[stage6] m-JIWt9DTYI: no segments at threshold=7
+[stage6] P29Rf4IlmRk: no segments at threshold=7
+[stage6] batch done — 0 segments across 4 videos
+[stage8] wrote results.json + segments.csv — 0 segments across 4 videos
+[stage8] dataset — 0 assets (none) -> dataset/
+
+[pipeline] artifacts:
+  json: crowd_output_india\delhi-chandni-chowk\results.json
+  csv: crowd_output_india\delhi-chandni-chowk\segments.csv
+  dataset: dataset
+--- delhi-chandni-chowk exit=0 at 2026-10-19 03:45:36 ---
+=== mumbai-dadar-market :: Mumbai Dadar market crowd aerial drone view :: 2026-10-19 03:45:36 ===
+[stage1] searching for 'Mumbai Dadar market crowd aerial drone view' (max 6, order=relevance)
+[stage1] found 6 video ids, fetching details
+[stage1] dropped 1 outside [30s, 3600s]
+[stage1] vantage filter (drop-ground): kept 5/5
+[stage1] done — 5 videos → discovery.json
+  ^ 91_Hfv0-XLk  (  4.6m,         73 views)  Scenic Drone Shoot of Mumbai During Coronavirus Lockdown
+  ^ a-a9ZWdVdh0  (  2.2m,        119 views)  Scenic Drone Shoot of Mumbai during Coronavirus lockdown
+  ^ 0rlGdCPfEfo  (  0.8m,         89 views)  MUMBAI Scenic Drone Shoot of Mumbai | India | Hamid kasm
+  ^ eS81J95h0Ew  (  4.1m,         78 views)  Scenic Drone Shoot of Mumbai during Coronavirus Lockdown
+  ^ 940L4cwwJsw  (  6.0m,        357 views)  Mumbai Lockdown Drone Shots | Mumbai Lockdown Drone View
+[stage2] probing https://www.youtube.com/watch?v=91_Hfv0-XLk
+[stage2] downloading 91_Hfv0-XLk
+ERROR: unable to download video data: HTTP Error 403: Forbidden
+[stage2] skipping https://www.youtube.com/watch?v=91_Hfv0-XLk — ERROR: unable to download video data: HTTP Error 403: Forbidden
+[stage2] probing https://www.youtube.com/watch?v=a-a9ZWdVdh0
+ERROR: [youtube] a-a9ZWdVdh0: This video is not available
+[stage2] skipping https://www.youtube.com/watch?v=a-a9ZWdVdh0 — ERROR: [youtube] a-a9ZWdVdh0: This video is not available
+[stage2] probing https://www.youtube.com/watch?v=0rlGdCPfEfo
+[stage2] downloading 0rlGdCPfEfo
+[stage2] 0rlGdCPfEfo: extracting frames at 1.0 fps → crowd_output_india\mumbai-dadar-market\0rlGdCPfEfo\frames
+[stage2] 0rlGdCPfEfo: 44 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=eS81J95h0Ew
+[stage2] downloading eS81J95h0Ew
+[stage2] eS81J95h0Ew: extracting frames at 1.0 fps → crowd_output_india\mumbai-dadar-market\eS81J95h0Ew\frames
+[stage2] eS81J95h0Ew: 244 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=940L4cwwJsw
+[stage2] downloading 940L4cwwJsw
+[stage2] 940L4cwwJsw: extracting frames at 1.0 fps → crowd_output_india\mumbai-dadar-market\940L4cwwJsw\frames
+[stage2] 940L4cwwJsw: 360 frames extracted
+[stage2] done — 3/5 videos prepared
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] 0rlGdCPfEfo: scoring 44 frames
+[stage3] 0rlGdCPfEfo: 44/44 candidates (0% reduction)
+[stage3] eS81J95h0Ew: scoring 244 frames
+[stage3] eS81J95h0Ew: 244/244 candidates (0% reduction)
+[stage3] 940L4cwwJsw: scoring 360 frames
+[stage3] 940L4cwwJsw: 360/360 candidates (0% reduction)
+[stage3] batch done — 648/648 frames pass (0% reduction)
+[stage4] 0rlGdCPfEfo: scoring 44 frames at 15 RPM
+  [stage4] 10/44 scored
+  [stage4] 20/44 scored
+  [stage4] 30/44 scored
+  [stage4] 40/44 scored
+  [stage4] 44/44 scored
+[stage4] 0rlGdCPfEfo: 0/44 high-density (score >= 7), 0 of those elevated
+[stage4] 0rlGdCPfEfo: vantage mix — ground=15, unknown=14, aerial=8, elevated=7
+[stage4] eS81J95h0Ew: scoring 244 frames at 15 RPM
+  [stage4] 10/244 scored
+  [stage4] 20/244 scored
+  [stage4] 30/244 scored
+  [stage4] 40/244 scored
+  [stage4] 50/244 scored
+  [stage4] 60/244 scored
+  [stage4] 70/244 scored
+  [stage4] 80/244 scored
+  [stage4] 90/244 scored
+  [stage4] 100/244 scored
+  [stage4] 110/244 scored
+  [stage4] 120/244 scored
+  [stage4] 130/244 scored
+  [stage4] 140/244 scored
+  [stage4] 150/244 scored
+  [stage4] 160/244 scored
+  [stage4] 170/244 scored
+  [stage4] 180/244 scored
+  [stage4] 190/244 scored
+  [stage4] 200/244 scored
+  [stage4] 210/244 scored
+  [stage4] 220/244 scored
+  [stage4] 230/244 scored
+  [stage4] 240/244 scored
+  [stage4] 244/244 scored
+[stage4] eS81J95h0Ew: 0/244 high-density (score >= 7), 0 of those elevated
+[stage4] eS81J95h0Ew: vantage mix — aerial=227, unknown=11, ground=6
+[stage4] 940L4cwwJsw: scoring 360 frames at 15 RPM
+  [stage4] 10/360 scored
+  [stage4] 20/360 scored
+  [stage4] 30/360 scored
+  [stage4] 40/360 scored
+  [stage4] 50/360 scored
+  [stage4] 60/360 scored
+  [stage4] 70/360 scored
+  [stage4] 80/360 scored
+  [stage4] 90/360 scored
+  [stage4] 100/360 scored
+  [stage4] 110/360 scored
+  [stage4] 120/360 scored
+  [stage4] 130/360 scored
+  [stage4] 140/360 scored
+  [stage4] 150/360 scored
+  [stage4] 160/360 scored
+  [stage4] 170/360 scored
+  [stage4] 180/360 scored
+  [stage4] 190/360 scored
+  [stage4] 200/360 scored
+  [stage4] 210/360 scored
+  [stage4] 220/360 scored
+  [stage4] 230/360 scored
+  [stage4] 240/360 scored
+  [stage4] 250/360 scored
+  [stage4] 260/360 scored
+  [stage4] 270/360 scored
+  [stage4] 280/360 scored
+  [stage4] 290/360 scored
+  [stage4] 300/360 scored
+  [stage4] 310/360 scored
+  [stage4] 320/360 scored
+  [stage4] 330/360 scored
+  [stage4] 340/360 scored
+  [stage4] 350/360 scored
+[stage4] 940L4cwwJsw: quota gone after 353/360 new frames — 353 banked to gemini_scores.json
+[stage4] stopping batch — 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+[stage4] 1 of 3 video(s) unscored; rerun to resume from cache
+[stage4] batch done — 0/288 frames high-density, 0 high-density AND elevated, across 2/3 videos
+[stage6] 0rlGdCPfEfo: no segments at threshold=7
+[stage6] eS81J95h0Ew: no segments at threshold=7
+[stage6] batch done — 0 segments across 2 videos
+[stage8] wrote results.json + segments.csv — 0 segments across 2 videos
+[stage8] dataset — 0 assets (none) -> dataset/
+
+[pipeline] artifacts:
+  json: crowd_output_india\mumbai-dadar-market\results.json
+  csv: crowd_output_india\mumbai-dadar-market\segments.csv
+  dataset: dataset
+--- mumbai-dadar-market exit=0 at 2026-10-19 04:32:40 ---
+=== varanasi-dashashwamedh-ghat :: Varanasi ghat crowd aerial drone view :: 2026-10-19 04:32:40 ===
+[stage1] searching for 'Varanasi ghat crowd aerial drone view' (max 6, order=relevance)
+[stage1] found 6 video ids, fetching details
+[stage1] dropped 2 outside [30s, 3600s]
+[stage1] vantage filter (drop-ground): kept 3/4
+[stage1]   rejected z4SA0ciEoO8 [likely_ground: vlog] Dev Deepawali Varanasi | Cinematic Video | Sony 
+[stage1] done — 3 videos → discovery.json
+  ^ 29mnQmUPltc  (  5.5m,        311 views)  Kashi Dev Deepawali 2025 | Drone View of Varanasi Ghats 
+  ^ iQXJA50QLFw  (  2.1m,         40 views)  Experience the world-famous Ganga Aarti of Varanasi at A
+  ? Fnir46ENxfg  (  2.0m,  1,652,834 views)  Ganga Aarti Varanasi Full Video | Dashashwamedh Ghat Eve
+[stage2] 29mnQmUPltc: cached (offline) — 330 frames
+[stage2] probing https://www.youtube.com/watch?v=iQXJA50QLFw
+ERROR: [youtube] iQXJA50QLFw: This video is not available
+[stage2] skipping https://www.youtube.com/watch?v=iQXJA50QLFw — ERROR: [youtube] iQXJA50QLFw: This video is not available
+[stage2] probing https://www.youtube.com/watch?v=Fnir46ENxfg
+[stage2] downloading Fnir46ENxfg
+[stage2] Fnir46ENxfg: extracting frames at 1.0 fps → crowd_output_india\varanasi-dashashwamedh-ghat\Fnir46ENxfg\frames
+[stage2] Fnir46ENxfg: 123 frames extracted
+[stage2] done — 2/3 videos prepared
+[stage3] 29mnQmUPltc: cached prefilter reused (threshold=0)
+[stage3] 29mnQmUPltc: 330/330 candidates (0% reduction)
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] Fnir46ENxfg: scoring 123 frames
+[stage3] Fnir46ENxfg: 123/123 candidates (0% reduction)
+[stage3] batch done — 453/453 frames pass (0% reduction)
+[stage4] 29mnQmUPltc: scoring 330 frames at 15 RPM
+[stage4] 29mnQmUPltc: quota gone after 0/330 new frames — 0 banked to gemini_scores.json
+[stage4] stopping batch — 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+[stage4] 2 of 2 video(s) unscored; rerun to resume from cache
+[stage4] batch done — 0/0 frames high-density, 0 high-density AND elevated, across 0/2 videos
+[stage6] batch done — 0 segments across 0 videos
+[stage8] wrote results.json + segments.csv — 0 segments across 0 videos
+[stage8] dataset — 0 assets (none) -> dataset/
+
+[pipeline] artifacts:
+  json: crowd_output_india\varanasi-dashashwamedh-ghat\results.json
+  csv: crowd_output_india\varanasi-dashashwamedh-ghat\segments.csv
+  dataset: dataset
+--- varanasi-dashashwamedh-ghat exit=0 at 2026-10-19 04:33:03 ---
+=== prayagraj-kumbh-mela :: Kumbh Mela crowd aerial drone footage :: 2026-10-19 04:33:03 ===
+[stage1] searching for 'Kumbh Mela crowd aerial drone footage' (max 6, order=relevance)
+[stage1] found 6 video ids, fetching details
+[stage1] dropped 5 outside [30s, 3600s]
+[stage1] vantage filter (drop-ground): kept 1/1
+[stage1] done — 1 videos → discovery.json
+  ? f7Y7A9Rgn-A  ( 16.2m,  2,218,169 views)  MahaKumbh: World’s Largest Human Gathering | Prayagraj |
+[stage2] probing https://www.youtube.com/watch?v=f7Y7A9Rgn-A
+[stage2] downloading f7Y7A9Rgn-A
+[stage2] f7Y7A9Rgn-A: extracting frames at 1.0 fps → crowd_output_india\prayagraj-kumbh-mela\f7Y7A9Rgn-A\frames
+[stage2] f7Y7A9Rgn-A: 973 frames extracted
+[stage2] done — 1/1 videos prepared
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] f7Y7A9Rgn-A: scoring 973 frames
+[stage3] f7Y7A9Rgn-A: 973/973 candidates (0% reduction)
+[stage3] batch done — 973/973 frames pass (0% reduction)
+[stage4] f7Y7A9Rgn-A: scoring 973 frames at 15 RPM
+[stage4] f7Y7A9Rgn-A: quota gone after 0/973 new frames — 0 banked to gemini_scores.json
+[stage4] stopping batch — 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+[stage4] 1 of 1 video(s) unscored; rerun to resume from cache
+[stage4] batch done — 0/0 frames high-density, 0 high-density AND elevated, across 0/1 videos
+[stage6] batch done — 0 segments across 0 videos
+[stage8] wrote results.json + segments.csv — 0 segments across 0 videos
+[stage8] dataset — 0 assets (none) -> dataset/
+
+[pipeline] artifacts:
+  json: crowd_output_india\prayagraj-kumbh-mela\results.json
+  csv: crowd_output_india\prayagraj-kumbh-mela\segments.csv
+  dataset: dataset
+--- prayagraj-kumbh-mela exit=0 at 2026-10-19 04:33:56 ---
+=== mumbai-railway-station :: Mumbai railway station crowd from above overhead :: 2026-10-19 04:33:56 ===
+[stage1] searching for 'Mumbai railway station crowd from above overhead' (max 6, order=relevance)
+[stage1] found 6 video ids, fetching details
+[stage1] dropped 5 outside [30s, 3600s]
+[stage1] vantage filter (drop-ground): kept 1/1
+[stage1] done — 1 videos → discovery.json
+  ? DA4nIF9QrUI  (  1.0m,    109,580 views)  Mumbai train rush during peak hours
+[stage2] probing https://www.youtube.com/watch?v=DA4nIF9QrUI
+[stage2] downloading DA4nIF9QrUI
+[stage2] DA4nIF9QrUI: extracting frames at 1.0 fps → crowd_output_india\mumbai-railway-station\DA4nIF9QrUI\frames
+[stage2] DA4nIF9QrUI: 57 frames extracted
+[stage2] done — 1/1 videos prepared
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] DA4nIF9QrUI: scoring 57 frames
+[stage3] DA4nIF9QrUI: 57/57 candidates (0% reduction)
+[stage3] batch done — 57/57 frames pass (0% reduction)
+[stage4] DA4nIF9QrUI: scoring 57 frames at 15 RPM
+[stage4] DA4nIF9QrUI: quota gone after 0/57 new frames — 0 banked to gemini_scores.json
+[stage4] stopping batch — 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+[stage4] 1 of 1 video(s) unscored; rerun to resume from cache
+[stage4] batch done — 0/0 frames high-density, 0 high-density AND elevated, across 0/1 videos
+[stage6] batch done — 0 segments across 0 videos
+[stage8] wrote results.json + segments.csv — 0 segments across 0 videos
+[stage8] dataset — 0 assets (none) -> dataset/
+
+[pipeline] artifacts:
+  json: crowd_output_india\mumbai-railway-station\results.json
+  csv: crowd_output_india\mumbai-railway-station\segments.csv
+  dataset: dataset
+--- mumbai-railway-station exit=0 at 2026-10-19 04:34:11 ---
+=== kolkata-howrah-bridge :: Howrah Bridge Kolkata crowd aerial drone :: 2026-10-19 04:34:11 ===
+[stage1] searching for 'Howrah Bridge Kolkata crowd aerial drone' (max 6, order=relevance)
+[stage1] found 6 video ids, fetching details
+[stage1] dropped 5 outside [30s, 3600s]
+[stage1] vantage filter (drop-ground): kept 1/1
+[stage1] done — 1 videos → discovery.json
+  ^ _jgIygoaS1o  (  4.4m,      4,857 views)  HOWRAH BRIDGE Drone view 4k | KOLKATA Stock footages
+[stage2] probing https://www.youtube.com/watch?v=_jgIygoaS1o
+[stage2] downloading _jgIygoaS1o
+[stage2] _jgIygoaS1o: extracting frames at 1.0 fps → crowd_output_india\kolkata-howrah-bridge\_jgIygoaS1o\frames
+[stage2] _jgIygoaS1o: 262 frames extracted
+[stage2] done — 1/1 videos prepared
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] _jgIygoaS1o: scoring 262 frames
+[stage3] _jgIygoaS1o: 262/262 candidates (0% reduction)
+[stage3] batch done — 262/262 frames pass (0% reduction)
+[stage4] _jgIygoaS1o: scoring 262 frames at 15 RPM
+[stage4] _jgIygoaS1o: quota gone after 0/262 new frames — 0 banked to gemini_scores.json
+[stage4] stopping batch — 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+[stage4] 1 of 1 video(s) unscored; rerun to resume from cache
+[stage4] batch done — 0/0 frames high-density, 0 high-density AND elevated, across 0/1 videos
+[stage6] batch done — 0 segments across 0 videos
+[stage8] wrote results.json + segments.csv — 0 segments across 0 videos
+[stage8] dataset — 0 assets (none) -> dataset/
+
+[pipeline] artifacts:
+  json: crowd_output_india\kolkata-howrah-bridge\results.json
+  csv: crowd_output_india\kolkata-howrah-bridge\segments.csv
+  dataset: dataset
+--- kolkata-howrah-bridge exit=0 at 2026-10-19 04:34:40 ---
+=== jaipur-johari-bazaar :: Jaipur bazaar crowd aerial drone view :: 2026-10-19 04:34:40 ===
+[stage1] searching for 'Jaipur bazaar crowd aerial drone view' (max 6, order=relevance)
+[stage1] found 6 video ids, fetching details
+[stage1] dropped 3 outside [30s, 3600s]
+[stage1] vantage filter (drop-ground): kept 3/3
+[stage1] done — 3 videos → discovery.json
+  ? 5AUhJQEGOms  (  1.1m,        314 views)  JAIPUR DIWALI, JOHARI BAZAR
+  ^ LQy1LH4gL2g  (  3.3m,         60 views)  Drone View of Jaipur City Under Lockdown || Pink City
+  ^ M2T3RdLZLMQ  (  0.7m,        249 views)  Jaipur Drone Video | Aerial Drone Route Video by NS Vent
+[stage2] probing https://www.youtube.com/watch?v=5AUhJQEGOms
+[stage2] downloading 5AUhJQEGOms
+[stage2] 5AUhJQEGOms: extracting frames at 1.0 fps → crowd_output_india\jaipur-johari-bazaar\5AUhJQEGOms\frames
+[stage2] 5AUhJQEGOms: 68 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=LQy1LH4gL2g
+[stage2] downloading LQy1LH4gL2g
+[stage2] LQy1LH4gL2g: extracting frames at 1.0 fps → crowd_output_india\jaipur-johari-bazaar\LQy1LH4gL2g\frames
+[stage2] LQy1LH4gL2g: 196 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=M2T3RdLZLMQ
+[stage2] downloading M2T3RdLZLMQ
+[stage2] M2T3RdLZLMQ: extracting frames at 1.0 fps → crowd_output_india\jaipur-johari-bazaar\M2T3RdLZLMQ\frames
+[stage2] M2T3RdLZLMQ: 43 frames extracted
+[stage2] done — 3/3 videos prepared
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] 5AUhJQEGOms: scoring 68 frames
+[stage3] 5AUhJQEGOms: 68/68 candidates (0% reduction)
+[stage3] LQy1LH4gL2g: scoring 196 frames
+[stage3] LQy1LH4gL2g: 196/196 candidates (0% reduction)
+[stage3] M2T3RdLZLMQ: scoring 43 frames
+[stage3] M2T3RdLZLMQ: 43/43 candidates (0% reduction)
+[stage3] batch done — 307/307 frames pass (0% reduction)
+[stage4] 5AUhJQEGOms: scoring 68 frames at 15 RPM
+[stage4] 5AUhJQEGOms: quota gone after 0/68 new frames — 0 banked to gemini_scores.json
+[stage4] stopping batch — 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+[stage4] 3 of 3 video(s) unscored; rerun to resume from cache
+[stage4] batch done — 0/0 frames high-density, 0 high-density AND elevated, across 0/3 videos
+[stage6] batch done — 0 segments across 0 videos
+[stage8] wrote results.json + segments.csv — 0 segments across 0 videos
+[stage8] dataset — 0 assets (none) -> dataset/
+
+[pipeline] artifacts:
+  json: crowd_output_india\jaipur-johari-bazaar\results.json
+  csv: crowd_output_india\jaipur-johari-bazaar\segments.csv
+  dataset: dataset
+--- jaipur-johari-bazaar exit=0 at 2026-10-19 04:35:32 ---
+=== amritsar-golden-temple :: Golden Temple Amritsar crowd aerial drone view :: 2026-10-19 04:35:32 ===
+[stage1] searching for 'Golden Temple Amritsar crowd aerial drone view' (max 6, order=relevance)
+[stage1] found 6 video ids, fetching details
+[stage1] dropped 5 outside [30s, 3600s]
+[stage1] vantage filter (drop-ground): kept 1/1
+[stage1] done — 1 videos → discovery.json
+  ^ Nmd3I0CKsfs  (  5.8m,     30,637 views)  Golden temple drone video| Relaxing Video | Harminder Sa
+[stage2] probing https://www.youtube.com/watch?v=Nmd3I0CKsfs
+[stage2] downloading Nmd3I0CKsfs
+[stage2] Nmd3I0CKsfs: extracting frames at 1.0 fps → crowd_output_india\amritsar-golden-temple\Nmd3I0CKsfs\frames
+[stage2] Nmd3I0CKsfs: 350 frames extracted
+[stage2] done — 1/1 videos prepared
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] Nmd3I0CKsfs: scoring 350 frames
+[stage3] Nmd3I0CKsfs: 350/350 candidates (0% reduction)
+[stage3] batch done — 350/350 frames pass (0% reduction)
+[stage4] Nmd3I0CKsfs: scoring 350 frames at 15 RPM
+[stage4] Nmd3I0CKsfs: quota gone after 0/350 new frames — 0 banked to gemini_scores.json
+[stage4] stopping batch — 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+[stage4] 1 of 1 video(s) unscored; rerun to resume from cache
+[stage4] batch done — 0/0 frames high-density, 0 high-density AND elevated, across 0/1 videos
+[stage6] batch done — 0 segments across 0 videos
+[stage8] wrote results.json + segments.csv — 0 segments across 0 videos
+[stage8] dataset — 0 assets (none) -> dataset/
+
+[pipeline] artifacts:
+  json: crowd_output_india\amritsar-golden-temple\results.json
+  csv: crowd_output_india\amritsar-golden-temple\segments.csv
+  dataset: dataset
+--- amritsar-golden-temple exit=0 at 2026-10-19 04:36:00 ---
+=== ELEVATED BATCH FINISHED 2026-10-19 04:36:00 ===

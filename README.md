@@ -1,10 +1,12 @@
 # Crowd Density Extraction Pipeline
 
-Search YouTube for videos, score every frame for crowd density with Gemini 2.5 Flash, and export timestamped high-density segments as JSON, CSV, and MP4 clips.
+Search YouTube for videos, score every frame for crowd density with Gemini 3.5 Flash, and export timestamped high-density segments as JSON, CSV, and MP4 clips.
 
 Designed to run on **free-tier APIs only**. Local YOLOv8-nano replaces Google Cloud Vision (which would exceed its 1K-units/month free tier within ~5 videos). Gemini stays within its 15 RPM free quota. Zero cloud spend by default.
 
 For the *why* behind each design choice and diagrams of the internals, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
+**New collaborator collecting India elevated-crowd data?** Start with [GETTING_STARTED.md](GETTING_STARTED.md). It's a step-by-step setup and prompt-to-dataset guide that doesn't need Claude Code.
 
 ---
 
@@ -181,6 +183,17 @@ python stage2_download_prepare.py <url> --fps 2.0    # 2 frames per second
 
 Doubles the number of frames extracted (and roughly doubles Gemini calls). Default is `--fps 1.0`.
 
+### Change download resolution
+
+```bash
+python stage2_download_prepare.py <url> --max-height 480    # smaller download
+```
+
+Downloads are capped at 720p by default. Frames are rescaled to `RESIZE_WIDTH` (1280 px) before
+anything reads them and YOLO sees 640 px, so pulling 4K costs roughly 9x the bytes and disk for
+identical scores — a 30-minute upload is ~5.7 GB at 2160p versus ~0.7 GB at 720p. Raise it only if
+you plan to export clips at full quality with `--export-clips`.
+
 ### Change ranking order
 
 Stage 1 supports YouTube's built-in ranking:
@@ -200,7 +213,44 @@ Set `--min-persons 0` — this counts as passing everything through:
 python stage4_gemini_score.py <url> --min-persons 0
 ```
 
-Warning: at 1 fps a 3-min video makes ~180 Gemini calls (~12 min at 15 RPM). Only useful for validation.
+Warning: at 1 fps a 3-min video makes ~180 Gemini calls (~12 min at 15 RPM). Use it for validation
+and for aerial/elevated footage (next section), where YOLO cannot find people.
+
+### Elevated crowds and the Getty-style dataset
+
+To collect crowds filmed from height (drone, rooftop, overbridge, balcony) rather than at street level:
+
+```bash
+python stage1_search.py "Kumbh Mela crowd aerial drone" --max-results 6 --drop-ground \
+    --min-persons 0 --full-pipeline --out crowd_output_india/prayagraj-kumbh-mela \
+    --dataset dataset --location prayagraj-kumbh-mela
+```
+
+Vantage is filtered twice:
+
+- **Stage 1** reads title/description/tags for height markers (`_vantage_hint`): `--require-elevated`
+  keeps only `likely_elevated` videos, `--drop-ground` drops `likely_ground` ones. This is a cheap bias, not a gate.
+- **Stage 4** has Gemini label each frame `ground` / `elevated` / `aerial` / `unknown` by geometry
+  (viewing angle, sky, tops of heads). **Stage 6 keeps only elevated/aerial high-density frames** — this is the
+  real gate. It is cached, so changing it is free. `--any-vantage` (stages 6, 8) keeps ground-level segments too.
+
+Always pass `--min-persons 0` here: from directly above, YOLOv8n finds few or no people in genuinely dense crowds,
+so the pre-filter would discard exactly the frames you want.
+
+`--dataset DIR --location SLUG` makes Stage 8 export a Getty-style tree, and merges into `DIR/manifest.csv` across runs:
+
+```
+dataset/<location>/<vantage>/IND_<CODE>_NNNN/{clip.mp4, poster.jpg, metadata.json}
+```
+
+Every `metadata.json` carries `"rights_cleared": false`. These are YouTube uploads; confirm licensing before redistributing.
+
+**Searching all of India.** `discover_india.py` runs ~60 queries (festivals, protests, rallies, transit, markets…) with
+`regionCode=IN`, tiers the results (A = metadata signals both height and a crowd) and writes
+`candidates/india_candidates.json|csv`. Protest and rally queries are limited to the last 365 days. It costs
+~6,000 of the 10,000 daily YouTube quota units; `--rank-only` re-ranks cached results for free and `--dry-run`
+prints the plan. `run_india_batch.py` then runs the best tier-A videos location by location (`--dry-run` to preview).
+Tiers are metadata priors — Gemini's per-frame vantage and density remain the real filter.
 
 ---
 
@@ -311,7 +361,7 @@ You haven't enabled the YouTube Data API v3 on your Google Cloud project. Go to 
 ### Gemini scoring is slow
 
 At the free tier (15 RPM), 100 candidate frames take ~7 minutes. Options:
-- `--rpm 60` (requires paid tier)
+- `--rpm 300 --workers 8` (requires paid tier). Calls take ~2 s each, so one worker tops out near 30 RPM no matter how high `--rpm` is; `--workers` runs calls concurrently while `--rpm` still caps the total
 - Raise `--min-persons` in Stage 3 to reduce candidates
 - Reduce `--fps` in Stage 2 (1 fps → 0.5 fps halves the load)
 

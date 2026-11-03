@@ -1,0 +1,405 @@
+
+=== INDIA BATCH 2026-10-19 05:56:16 60 videos ===
+
+=== india-roadshow (1/25) 05:56:16 ===
+[stage2] T6cFad05Qzg: cached (offline) — 27 frames
+[stage2] AWhkS5cwNSY: cached (offline) — 32 frames
+[stage2] coMjVcuSlBs: cached (offline) — 161 frames
+[stage2] done — 3/3 videos prepared
+[stage3] T6cFad05Qzg: cached prefilter reused (threshold=0)
+[stage3] T6cFad05Qzg: 27/27 candidates (0% reduction)
+[stage3] AWhkS5cwNSY: cached prefilter reused (threshold=0)
+[stage3] AWhkS5cwNSY: 32/32 candidates (0% reduction)
+[stage3] coMjVcuSlBs: cached prefilter reused (threshold=0)
+[stage3] coMjVcuSlBs: 161/161 candidates (0% reduction)
+[stage3] batch done — 220/220 frames pass (0% reduction)
+[stage4] T6cFad05Qzg: 10 cached, 17 new
+[stage4] T6cFad05Qzg: scoring 17 frames at 300 RPM, 8 workers
+  [stage4] 10/17 scored
+  [stage4] 17/17 scored
+[stage4] T6cFad05Qzg: 24/27 high-density (score >= 7), 15 of those elevated
+[stage4] T6cFad05Qzg: vantage mix — elevated=16, ground=10, aerial=1
+[stage4] AWhkS5cwNSY: scoring 32 frames at 300 RPM, 8 workers
+  [stage4] 10/32 scored
+  [stage4] 20/32 scored
+  [stage4] 30/32 scored
+  [stage4] 32/32 scored
+[stage4] AWhkS5cwNSY: 32/32 high-density (score >= 7), 32 of those elevated
+[stage4] AWhkS5cwNSY: vantage mix — elevated=32
+[stage4] coMjVcuSlBs: scoring 161 frames at 300 RPM, 8 workers
+  [stage4] 10/161 scored
+  [stage4] 20/161 scored
+  [stage4] 30/161 scored
+  [stage4] 40/161 scored
+  [stage4] 50/161 scored
+  [stage4] 60/161 scored
+  [stage4] 70/161 scored
+  [stage4] 80/161 scored
+  [stage4] 90/161 scored
+  [stage4] 100/161 scored
+  [stage4] 110/161 scored
+  [stage4] 120/161 scored
+  [stage4] 130/161 scored
+  [stage4] 140/161 scored
+  [stage4] 150/161 scored
+  [stage4] 160/161 scored
+  [stage4] 161/161 scored
+[stage4] coMjVcuSlBs: 161/161 high-density (score >= 7), 161 of those elevated
+[stage4] coMjVcuSlBs: vantage mix — elevated=87, aerial=74
+[stage4] batch done — 217/220 frames high-density, 208 high-density AND elevated, across 3/3 videos
+[stage6] T6cFad05Qzg: vantage gate kept 15/24 high-density frames (elevated only)
+[stage6] T6cFad05Qzg: 2 segments, peak score 8, 20s of crowd (threshold=7)
+[stage6] AWhkS5cwNSY: 1 segments, peak score 9, 32s of crowd (threshold=7)
+[stage6] coMjVcuSlBs: 1 segments, peak score 9, 161s of crowd (threshold=7)
+[stage6] batch done — 4 segments across 3 videos
+[stage8] wrote results.json + segments.csv — 4 segments across 3 videos
+[stage8] dataset — 4 assets (elevated=4) -> dataset/
+
+[stage8] artifacts:
+  json: crowd_output_india\india-roadshow\results.json
+  csv: crowd_output_india\india-roadshow\segments.csv
+  dataset: dataset
+
+=== patna-chhath-puja (2/25) 05:58:56 ===
+[stage2] probing https://www.youtube.com/watch?v=dpj3CzYXa9Q
+[stage2] downloading dpj3CzYXa9Q
+[stage2] dpj3CzYXa9Q: extracting frames at 1.0 fps → crowd_output_india\patna-chhath-puja\dpj3CzYXa9Q\frames
+[stage2] dpj3CzYXa9Q: 20 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=pAq9ESl9Qco
+[stage2] downloading pAq9ESl9Qco
+[stage2] pAq9ESl9Qco: extracting frames at 1.0 fps → crowd_output_india\patna-chhath-puja\pAq9ESl9Qco\frames
+[stage2] pAq9ESl9Qco: 185 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=f39d3rPVKvQ
+[stage2] downloading f39d3rPVKvQ
+[stage2] f39d3rPVKvQ: extracting frames at 1.0 fps → crowd_output_india\patna-chhath-puja\f39d3rPVKvQ\frames
+[stage2] f39d3rPVKvQ: 20 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=x8ECmLYJdrI
+[stage2] downloading x8ECmLYJdrI
+[stage2] x8ECmLYJdrI: extracting frames at 1.0 fps → crowd_output_india\patna-chhath-puja\x8ECmLYJdrI\frames
+[stage2] x8ECmLYJdrI: 20 frames extracted
+[stage2] done — 4/4 videos prepared
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] dpj3CzYXa9Q: scoring 20 frames
+[stage3] dpj3CzYXa9Q: 20/20 candidates (0% reduction)
+[stage3] pAq9ESl9Qco: scoring 185 frames
+[stage3] pAq9ESl9Qco: 185/185 candidates (0% reduction)
+[stage3] f39d3rPVKvQ: scoring 20 frames
+[stage3] f39d3rPVKvQ: 20/20 candidates (0% reduction)
+[stage3] x8ECmLYJdrI: scoring 20 frames
+[stage3] x8ECmLYJdrI: 20/20 candidates (0% reduction)
+[stage3] batch done — 245/245 frames pass (0% reduction)
+[stage4] dpj3CzYXa9Q: scoring 20 frames at 300 RPM, 8 workers
+  [stage4] 10/20 scored
+  [stage4] 20/20 scored
+[stage4] dpj3CzYXa9Q: 6/20 high-density (score >= 7), 1 of those elevated
+[stage4] dpj3CzYXa9Q: vantage mix — ground=14, elevated=5, unknown=1
+[stage4] pAq9ESl9Qco: scoring 185 frames at 300 RPM, 8 workers
+  [stage4] 10/185 scored
+  [stage4] 20/185 scored
+  [stage4] 30/185 scored
+  [stage4] 40/185 scored
+  [stage4] 50/185 scored
+  [stage4] 60/185 scored
+  [stage4] 70/185 scored
+  [stage4] 80/185 scored
+  [stage4] 90/185 scored
+  [stage4] 100/185 scored
+  [stage4] 110/185 scored
+  [stage4] 120/185 scored
+  [stage4] 130/185 scored
+  [stage4] 140/185 scored
+  [stage4] 150/185 scored
+  [stage4] 160/185 scored
+  [stage4] 170/185 scored
+  [stage4] 180/185 scored
+  [stage4] 185/185 scored
+[stage4] pAq9ESl9Qco: 1/185 high-density (score >= 7), 1 of those elevated
+[stage4] pAq9ESl9Qco: vantage mix — aerial=179, elevated=3, unknown=3
+[stage4] f39d3rPVKvQ: scoring 20 frames at 300 RPM, 8 workers
+  [stage4] 10/20 scored
+  [stage4] 20/20 scored
+[stage4] f39d3rPVKvQ: 7/20 high-density (score >= 7), 5 of those elevated
+[stage4] f39d3rPVKvQ: vantage mix — ground=10, elevated=7, aerial=3
+[stage4] x8ECmLYJdrI: scoring 20 frames at 300 RPM, 8 workers
+  [stage4] 10/20 scored
+  [stage4] 20/20 scored
+[stage4] x8ECmLYJdrI: 13/20 high-density (score >= 7), 13 of those elevated
+[stage4] x8ECmLYJdrI: vantage mix — aerial=14, elevated=5, ground=1
+[stage4] batch done — 27/245 frames high-density, 20 high-density AND elevated, across 4/4 videos
+[stage6] dpj3CzYXa9Q: vantage gate kept 1/6 high-density frames (elevated only)
+[stage6] dpj3CzYXa9Q: 1 segments, peak score 7, 1s of crowd (threshold=7)
+[stage6] pAq9ESl9Qco: 1 segments, peak score 7, 1s of crowd (threshold=7)
+[stage6] f39d3rPVKvQ: vantage gate kept 5/7 high-density frames (elevated only)
+[stage6] f39d3rPVKvQ: 3 segments, peak score 7, 5s of crowd (threshold=7)
+[stage6] x8ECmLYJdrI: 1 segments, peak score 8, 13s of crowd (threshold=7)
+[stage6] batch done — 6 segments across 4 videos
+[stage8] wrote results.json + segments.csv — 6 segments across 4 videos
+[stage8] dataset — 6 assets (aerial=2, elevated=4) -> dataset/
+
+[stage8] artifacts:
+  json: crowd_output_india\patna-chhath-puja\results.json
+  csv: crowd_output_india\patna-chhath-puja\segments.csv
+  dataset: dataset
+
+=== india-protest (3/25) 06:02:27 ===
+[stage2] probing https://www.youtube.com/watch?v=0KJ_cfebG7Y
+[stage2] downloading 0KJ_cfebG7Y
+[stage2] 0KJ_cfebG7Y: extracting frames at 1.0 fps → crowd_output_india\india-protest\0KJ_cfebG7Y\frames
+[stage2] 0KJ_cfebG7Y: 25 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=2qL7zRZ4iMk
+[stage2] downloading 2qL7zRZ4iMk
+[stage2] 2qL7zRZ4iMk: extracting frames at 1.0 fps → crowd_output_india\india-protest\2qL7zRZ4iMk\frames
+[stage2] 2qL7zRZ4iMk: 81 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=gMy6uyJjtKo
+[stage2] downloading gMy6uyJjtKo
+[stage2] gMy6uyJjtKo: extracting frames at 1.0 fps → crowd_output_india\india-protest\gMy6uyJjtKo\frames
+[stage2] gMy6uyJjtKo: 25 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=oBcUP2N8FKw
+[stage2] downloading oBcUP2N8FKw
+[stage2] oBcUP2N8FKw: extracting frames at 1.0 fps → crowd_output_india\india-protest\oBcUP2N8FKw\frames
+[stage2] oBcUP2N8FKw: 29 frames extracted
+[stage2] done — 4/4 videos prepared
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] 0KJ_cfebG7Y: scoring 25 frames
+[stage3] 0KJ_cfebG7Y: 25/25 candidates (0% reduction)
+[stage3] 2qL7zRZ4iMk: scoring 81 frames
+[stage3] 2qL7zRZ4iMk: 81/81 candidates (0% reduction)
+[stage3] gMy6uyJjtKo: scoring 25 frames
+[stage3] gMy6uyJjtKo: 25/25 candidates (0% reduction)
+[stage3] oBcUP2N8FKw: scoring 29 frames
+[stage3] oBcUP2N8FKw: 29/29 candidates (0% reduction)
+[stage3] batch done — 160/160 frames pass (0% reduction)
+[stage4] 0KJ_cfebG7Y: scoring 25 frames at 300 RPM, 8 workers
+  [stage4] 10/25 scored
+  [stage4] 20/25 scored
+  [stage4] 25/25 scored
+[stage4] 0KJ_cfebG7Y: 25/25 high-density (score >= 7), 25 of those elevated
+[stage4] 0KJ_cfebG7Y: vantage mix — aerial=25
+[stage4] 2qL7zRZ4iMk: scoring 81 frames at 300 RPM, 8 workers
+  [stage4] 10/81 scored
+  [stage4] 20/81 scored
+  [stage4] 30/81 scored
+  [stage4] 40/81 scored
+  [stage4] 50/81 scored
+  [stage4] 60/81 scored
+  [stage4] 70/81 scored
+  [stage4] 80/81 scored
+  [stage4] 81/81 scored
+[stage4] 2qL7zRZ4iMk: 76/81 high-density (score >= 7), 76 of those elevated
+[stage4] 2qL7zRZ4iMk: vantage mix — aerial=81
+[stage4] gMy6uyJjtKo: scoring 25 frames at 300 RPM, 8 workers
+  [stage4] 10/25 scored
+  [stage4] 20/25 scored
+  [stage4] 25/25 scored
+[stage4] gMy6uyJjtKo: 25/25 high-density (score >= 7), 25 of those elevated
+[stage4] gMy6uyJjtKo: vantage mix — aerial=25
+[stage4] oBcUP2N8FKw: scoring 29 frames at 300 RPM, 8 workers
+  [stage4] 10/29 scored
+  [stage4] 20/29 scored
+  [stage4] 29/29 scored
+[stage4] oBcUP2N8FKw: 20/29 high-density (score >= 7), 20 of those elevated
+[stage4] oBcUP2N8FKw: vantage mix — aerial=26, unknown=3
+[stage4] batch done — 146/160 frames high-density, 146 high-density AND elevated, across 4/4 videos
+[stage6] 0KJ_cfebG7Y: 1 segments, peak score 9, 25s of crowd (threshold=7)
+[stage6] 2qL7zRZ4iMk: 1 segments, peak score 9, 81s of crowd (threshold=7)
+[stage6] gMy6uyJjtKo: 1 segments, peak score 9, 25s of crowd (threshold=7)
+[stage6] oBcUP2N8FKw: 2 segments, peak score 8, 22s of crowd (threshold=7)
+[stage6] batch done — 5 segments across 4 videos
+[stage8] wrote results.json + segments.csv — 5 segments across 4 videos
+[stage8] dataset — 5 assets (aerial=5) -> dataset/
+
+[stage8] artifacts:
+  json: crowd_output_india\india-protest\results.json
+  csv: crowd_output_india\india-protest\segments.csv
+  dataset: dataset
+
+=== india-election-rally (4/25) 06:04:54 ===
+[stage2] probing https://www.youtube.com/watch?v=gaXpLqrDg1Y
+[stage2] downloading gaXpLqrDg1Y
+[stage2] gaXpLqrDg1Y: extracting frames at 1.0 fps → crowd_output_india\india-election-rally\gaXpLqrDg1Y\frames
+[stage2] gaXpLqrDg1Y: 189 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=bVlQ6nsJSSI
+[stage2] downloading bVlQ6nsJSSI
+[stage2] bVlQ6nsJSSI: extracting frames at 1.0 fps → crowd_output_india\india-election-rally\bVlQ6nsJSSI\frames
+[stage2] bVlQ6nsJSSI: 95 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=lMw9a_Ykcg0
+[stage2] downloading lMw9a_Ykcg0
+[stage2] lMw9a_Ykcg0: extracting frames at 1.0 fps → crowd_output_india\india-election-rally\lMw9a_Ykcg0\frames
+[stage2] lMw9a_Ykcg0: 159 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=U2V7Fm7-MCg
+[stage2] downloading U2V7Fm7-MCg
+ERROR: unable to download video data: HTTP Error 403: Forbidden
+[stage2] skipping https://www.youtube.com/watch?v=U2V7Fm7-MCg — ERROR: unable to download video data: HTTP Error 403: Forbidden
+[stage2] done — 3/4 videos prepared
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] gaXpLqrDg1Y: scoring 189 frames
+[stage3] gaXpLqrDg1Y: 189/189 candidates (0% reduction)
+[stage3] bVlQ6nsJSSI: scoring 95 frames
+[stage3] bVlQ6nsJSSI: 95/95 candidates (0% reduction)
+[stage3] lMw9a_Ykcg0: scoring 159 frames
+[stage3] lMw9a_Ykcg0: 159/159 candidates (0% reduction)
+[stage3] batch done — 443/443 frames pass (0% reduction)
+[stage4] gaXpLqrDg1Y: scoring 189 frames at 300 RPM, 8 workers
+  [stage4] 10/189 scored
+  [stage4] 20/189 scored
+  [stage4] 30/189 scored
+  [stage4] 40/189 scored
+  [stage4] 50/189 scored
+  [stage4] 60/189 scored
+  [stage4] 70/189 scored
+  [stage4] 80/189 scored
+  [stage4] 90/189 scored
+  [stage4] 100/189 scored
+  [stage4] 110/189 scored
+  [stage4] 120/189 scored
+  [stage4] 130/189 scored
+  [stage4] 140/189 scored
+  [stage4] 150/189 scored
+  [stage4] 160/189 scored
+  [stage4] 170/189 scored
+  [stage4] 180/189 scored
+  [stage4] 189/189 scored
+[stage4] gaXpLqrDg1Y: 93/189 high-density (score >= 7), 92 of those elevated
+[stage4] gaXpLqrDg1Y: vantage mix — aerial=126, elevated=62, ground=1
+[stage4] bVlQ6nsJSSI: scoring 95 frames at 300 RPM, 8 workers
+  [stage4] 10/95 scored
+  [stage4] 20/95 scored
+  [stage4] 30/95 scored
+  [stage4] 40/95 scored
+  [stage4] 50/95 scored
+  [stage4] 60/95 scored
+  [stage4] 70/95 scored
+  [stage4] 80/95 scored
+  [stage4] 90/95 scored
+  [stage4] 95/95 scored
+[stage4] bVlQ6nsJSSI: 63/95 high-density (score >= 7), 63 of those elevated
+[stage4] bVlQ6nsJSSI: vantage mix — aerial=50, elevated=45
+[stage4] lMw9a_Ykcg0: scoring 159 frames at 300 RPM, 8 workers
+  [stage4] 10/159 scored
+  [stage4] 20/159 scored
+  [stage4] 30/159 scored
+  [stage4] 40/159 scored
+  [stage4] 50/159 scored
+  [stage4] 60/159 scored
+  [stage4] 70/159 scored
+  [stage4] 80/159 scored
+  [stage4] 90/159 scored
+  [stage4] 100/159 scored
+  [stage4] 110/159 scored
+  [stage4] 120/159 scored
+  [stage4] 130/159 scored
+  [stage4] 140/159 scored
+  [stage4] 150/159 scored
+  [stage4] 159/159 scored
+[stage4] lMw9a_Ykcg0: 27/159 high-density (score >= 7), 27 of those elevated
+[stage4] lMw9a_Ykcg0: vantage mix — aerial=124, elevated=29, ground=6
+[stage4] batch done — 183/443 frames high-density, 182 high-density AND elevated, across 3/3 videos
+[stage6] gaXpLqrDg1Y: vantage gate kept 92/93 high-density frames (elevated only)
+[stage6] gaXpLqrDg1Y: 6 segments, peak score 8, 104s of crowd (threshold=7)
+[stage6] bVlQ6nsJSSI: 2 segments, peak score 9, 64s of crowd (threshold=7)
+[stage6] lMw9a_Ykcg0: 4 segments, peak score 8, 32s of crowd (threshold=7)
+[stage6] batch done — 12 segments across 3 videos
+[stage8] wrote results.json + segments.csv — 12 segments across 3 videos
+[stage8] dataset — 12 assets (aerial=6, elevated=6) -> dataset/
+
+[stage8] artifacts:
+  json: crowd_output_india\india-election-rally\results.json
+  csv: crowd_output_india\india-election-rally\segments.csv
+  dataset: dataset
+
+=== mathura-holi (5/25) 06:12:04 ===
+[stage2] probing https://www.youtube.com/watch?v=xrkGqGKvvD0
+[stage2] downloading xrkGqGKvvD0
+[stage2] xrkGqGKvvD0: extracting frames at 1.0 fps → crowd_output_india\mathura-holi\xrkGqGKvvD0\frames
+[stage2] xrkGqGKvvD0: 155 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=9sUxl4bkZLA
+[stage2] downloading 9sUxl4bkZLA
+[stage2] 9sUxl4bkZLA: extracting frames at 1.0 fps → crowd_output_india\mathura-holi\9sUxl4bkZLA\frames
+[stage2] 9sUxl4bkZLA: 21 frames extracted
+[stage2] done — 2/2 videos prepared
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] xrkGqGKvvD0: scoring 155 frames
+[stage3] xrkGqGKvvD0: 155/155 candidates (0% reduction)
+[stage3] 9sUxl4bkZLA: scoring 21 frames
+[stage3] 9sUxl4bkZLA: 21/21 candidates (0% reduction)
+[stage3] batch done — 176/176 frames pass (0% reduction)
+[stage4] xrkGqGKvvD0: scoring 155 frames at 300 RPM, 8 workers
+  [stage4] 10/155 scored
+  [stage4] 20/155 scored
+  [stage4] 30/155 scored
+  [stage4] 40/155 scored
+  [stage4] 50/155 scored
+  [stage4] 60/155 scored
+  [stage4] 70/155 scored
+  [stage4] 80/155 scored
+  [stage4] 90/155 scored
+  [stage4] 100/155 scored
+  [stage4] 110/155 scored
+  [stage4] 120/155 scored
+  [stage4] 130/155 scored
+  [stage4] 140/155 scored
+  [stage4] 150/155 scored
+  [stage4] 155/155 scored
+[stage4] xrkGqGKvvD0: 140/155 high-density (score >= 7), 140 of those elevated
+[stage4] xrkGqGKvvD0: vantage mix — elevated=129, aerial=26
+[stage4] 9sUxl4bkZLA: scoring 21 frames at 300 RPM, 8 workers
+  [stage4] 10/21 scored
+  [stage4] 20/21 scored
+  [stage4] 21/21 scored
+[stage4] 9sUxl4bkZLA: 21/21 high-density (score >= 7), 21 of those elevated
+[stage4] 9sUxl4bkZLA: vantage mix — aerial=20, elevated=1
+[stage4] batch done — 161/176 frames high-density, 161 high-density AND elevated, across 2/2 videos
+[stage6] xrkGqGKvvD0: 4 segments, peak score 10, 143s of crowd (threshold=7)
+[stage6] 9sUxl4bkZLA: 1 segments, peak score 10, 21s of crowd (threshold=7)
+[stage6] batch done — 5 segments across 2 videos
+[stage8] wrote results.json + segments.csv — 5 segments across 2 videos
+[stage8] dataset — 5 assets (aerial=2, elevated=3) -> dataset/
+
+[stage8] artifacts:
+  json: crowd_output_india\mathura-holi\results.json
+  csv: crowd_output_india\mathura-holi\segments.csv
+  dataset: dataset
+
+=== prayagraj-kumbh-mela (6/25) 06:14:35 ===
+[stage2] probing https://www.youtube.com/watch?v=a_wV47nvNeA
+[stage2] downloading a_wV47nvNeA
+[stage2] a_wV47nvNeA: extracting frames at 1.0 fps → crowd_output_india\prayagraj-kumbh-mela\a_wV47nvNeA\frames
+[stage2] a_wV47nvNeA: 20 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=TY7lzuBhuO0
+[stage2] downloading TY7lzuBhuO0
+[stage2] TY7lzuBhuO0: extracting frames at 1.0 fps → crowd_output_india\prayagraj-kumbh-mela\TY7lzuBhuO0\frames
+[stage2] TY7lzuBhuO0: 60 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=1SpR0ok1rKQ
+[stage2] downloading 1SpR0ok1rKQ
+[stage2] 1SpR0ok1rKQ: extracting frames at 1.0 fps → crowd_output_india\prayagraj-kumbh-mela\1SpR0ok1rKQ\frames
+[stage2] 1SpR0ok1rKQ: 267 frames extracted
+[stage2] probing https://www.youtube.com/watch?v=Y25_Dlp0tIg
+[stage2] downloading Y25_Dlp0tIg
+[stage2] Y25_Dlp0tIg: extracting frames at 1.0 fps → crowd_output_india\prayagraj-kumbh-mela\Y25_Dlp0tIg\frames
+[stage2] Y25_Dlp0tIg: 210 frames extracted
+[stage2] done — 4/4 videos prepared
+[stage3] loading YOLO model: yolov8n.pt
+[stage3] a_wV47nvNeA: scoring 20 frames
+[stage3] a_wV47nvNeA: 20/20 candidates (0% reduction)
+[stage3] TY7lzuBhuO0: scoring 60 frames
+[stage3] TY7lzuBhuO0: 60/60 candidates (0% reduction)
+[stage3] 1SpR0ok1rKQ: scoring 267 frames
+[stage3] 1SpR0ok1rKQ: 267/267 candidates (0% reduction)
+[stage3] Y25_Dlp0tIg: scoring 210 frames
+[stage3] Y25_Dlp0tIg: 210/210 candidates (0% reduction)
+[stage3] batch done — 557/557 frames pass (0% reduction)
+[stage4] a_wV47nvNeA: scoring 20 frames at 300 RPM, 8 workers
+  [stage4] 10/20 scored
+[stage4] a_wV47nvNeA: quota gone after 12/20 new frames — 12 banked to gemini_scores.json
+[stage4] stopping batch — 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your project has exceeded its monthly spending cap. Please go to AI Studio at https://ai.studio/spend to manage your project spend cap. Learn more at https://ai.google.dev/gemini-api/docs/billing#project-spend-caps. ', 'status': 'RESOURCE_EXHAUSTED'}}
+[stage4] 4 of 4 video(s) unscored; rerun to resume from cache
+[stage4] batch done — 0/0 frames high-density, 0 high-density AND elevated, across 0/4 videos
+[stage6] batch done — 0 segments across 0 videos
+[stage8] wrote results.json + segments.csv — 0 segments across 0 videos
+[stage8] dataset — 0 assets (none) -> dataset/
+
+[stage8] artifacts:
+  json: crowd_output_india\prayagraj-kumbh-mela\results.json
+  csv: crowd_output_india\prayagraj-kumbh-mela\segments.csv
+  dataset: dataset
+=== STOPPED: quota exhausted ===

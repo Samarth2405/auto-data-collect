@@ -22,6 +22,7 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
 # ── Constants (override via run_stage2 kwargs) ───────────────────────────────
 FRAME_RATE = 1.0       # frames per second to extract
 RESIZE_WIDTH = 1280    # pixel width; height scales to maintain aspect ratio
+MAX_HEIGHT = 720       # cap download resolution; frames are downsampled anyway
 OUTPUT_DIR = "./crowd_output"
 
 
@@ -86,17 +87,35 @@ def _check_ffmpeg() -> None:
         )
 
 
-def _download_video(url: str, video_dir: Path) -> tuple[Path, dict]:
-    """Download a single video; return (mp4_path, yt-dlp info dict)."""
+def _download_video(
+    url: str,
+    video_dir: Path,
+    max_height: int = MAX_HEIGHT,
+) -> tuple[Path, dict]:
+    """
+    Download a single video; return (mp4_path, yt-dlp info dict).
+
+    Capped at `max_height` because frames are downsampled to RESIZE_WIDTH before
+    anything looks at them — pulling 4K costs ~10x the bytes for identical scores.
+    """
     video_dir.mkdir(parents=True, exist_ok=True)
     out_template = str(video_dir / "video.%(ext)s")
 
+    # Four alternatives, each capped, because a bare uncapped tail would let any
+    # upload lacking an m4a audio stream fall through to 4K. format_sort keeps the
+    # last-resort "best" at or below the cap too.
     ydl_opts = {
-        # prefer mp4 with audio merged; fall back to best available
-        "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+        # prefer mp4+m4a at the cap, then any codec at the cap, then pre-muxed
+        "format": (
+            f"bestvideo[ext=mp4][height<={max_height}]+bestaudio[ext=m4a]/"
+            f"bestvideo[height<={max_height}]+bestaudio/"
+            f"best[height<={max_height}]/best"
+        ),
+        "format_sort": [f"res:{max_height}"],
         "outtmpl": out_template,
         "quiet": True,
         "no_warnings": True,
+        "noprogress": True,
         "merge_output_format": "mp4",
     }
 
@@ -149,6 +168,7 @@ def prepare_video(
     output_dir: Path,
     fps: float = FRAME_RATE,
     resize_width: int = RESIZE_WIDTH,
+    max_height: int = MAX_HEIGHT,
 ) -> VideoData | None:
     """
     Download one video and extract its frames.
@@ -188,7 +208,7 @@ def prepare_video(
     # ── Download ──────────────────────────────────────────────────────────────
     print(f"[stage2] downloading {video_id}")
     try:
-        video_path, info = _download_video(url, video_dir)
+        video_path, info = _download_video(url, video_dir, max_height)
     except yt_dlp.utils.DownloadError as exc:
         print(f"[stage2] skipping {url} — {exc}")
         return None
@@ -236,6 +256,7 @@ def run_stage2(
     output_dir: str = OUTPUT_DIR,
     fps: float = FRAME_RATE,
     resize_width: int = RESIZE_WIDTH,
+    max_height: int = MAX_HEIGHT,
 ) -> list[VideoData]:
     """Process a list of video URLs. Returns only successfully prepared videos."""
     out = Path(output_dir)
@@ -243,7 +264,7 @@ def run_stage2(
 
     results = []
     for url in urls:
-        video_data = prepare_video(url, out, fps, resize_width)
+        video_data = prepare_video(url, out, fps, resize_width, max_height)
         if video_data is not None:
             results.append(video_data)
 
@@ -260,8 +281,11 @@ if __name__ == "__main__":
     parser.add_argument("--out", default=OUTPUT_DIR, help="Output directory")
     parser.add_argument("--fps", type=float, default=FRAME_RATE, help="Frames per second")
     parser.add_argument("--width", type=int, default=RESIZE_WIDTH, help="Resize width in pixels")
+    parser.add_argument("--max-height", type=int, default=MAX_HEIGHT,
+                        help="Cap download resolution (default 720)")
     args = parser.parse_args()
 
-    videos = run_stage2(args.urls, output_dir=args.out, fps=args.fps, resize_width=args.width)
+    videos = run_stage2(args.urls, output_dir=args.out, fps=args.fps,
+                        resize_width=args.width, max_height=args.max_height)
     for v in videos:
         print(f"  {v.video_id}: {len(v.frame_paths)} frames — {v.title}")

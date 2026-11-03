@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import sys
+from collections import Counter
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -38,6 +39,7 @@ class Segment:
     person_count_avg: float
     person_count_peak: int
     yt_link: str
+    vantage: str = "unknown"    # dominant camera height across the group
     reasoning_samples: list[str] = field(default_factory=list)
 
 
@@ -98,6 +100,7 @@ def _aggregate(group: list[GeminiScore], url: str, fps: float) -> Segment:
         person_count_avg=round(sum(counts) / len(counts), 1),
         person_count_peak=max(counts),
         yt_link=_yt_link(url, start),
+        vantage=Counter(g.vantage for g in group).most_common(1)[0][0],
         reasoning_samples=[g.reasoning for g in group[:MAX_REASONING_SAMPLES]],
     )
 
@@ -115,15 +118,26 @@ def build_segments(
     scored: ScoredVideo,
     min_segment_secs: float = MIN_SEGMENT_SECS,
     crowd_threshold: int = CROWD_THRESHOLD,
+    require_elevated: bool = True,
 ) -> VideoSegments:
     """Merge Stage 4's high-density frames into time segments.
 
     crowd_threshold overrides CROWD_THRESHOLD so tune.py can re-segment
     from cache without changing any module constant.
+
+    require_elevated also demands the frame was shot from above the crowd.
+    Applied here rather than in Stage 4 so the vantage stays cached and a
+    rerun can widen or narrow the gate for free, same as the threshold.
     """
     video = scored.prefiltered.video
     # Filter inline so callers can pass a custom threshold
     hits = [s for s in scored.gemini_scores if s.crowd_score >= crowd_threshold]
+    if require_elevated:
+        before = len(hits)
+        hits = [s for s in hits if s.is_elevated]
+        if before != len(hits):
+            print(f"[stage6] {video.video_id}: vantage gate kept "
+                  f"{len(hits)}/{before} high-density frames (elevated only)")
     fps = float(video.metadata.get("fps_extracted", 1.0))
 
     groups = _group_by_gap(hits, min_segment_secs)
@@ -147,9 +161,11 @@ def run_stage6(
     scored_videos: list[ScoredVideo],
     min_segment_secs: float = MIN_SEGMENT_SECS,
     crowd_threshold: int = CROWD_THRESHOLD,
+    require_elevated: bool = True,
 ) -> list[VideoSegments]:
     """Build segments for a batch of scored videos."""
-    results = [build_segments(sv, min_segment_secs, crowd_threshold) for sv in scored_videos]
+    results = [build_segments(sv, min_segment_secs, crowd_threshold, require_elevated)
+               for sv in scored_videos]
     total = sum(len(vs.segments) for vs in results)
     print(f"[stage6] batch done — {total} segments across {len(results)} videos")
     return results
@@ -167,14 +183,19 @@ if __name__ == "__main__":
     parser.add_argument("--out", default="./crowd_output")
     parser.add_argument("--min-persons", type=int, default=5)
     parser.add_argument("--rpm", type=int, default=15)
+    parser.add_argument("--workers", type=int, default=1,
+                        help="Concurrent Gemini calls (paid tier); --rpm still caps the total")
+    parser.add_argument("--any-vantage", action="store_true",
+                        help="Keep ground-level segments too (default: elevated only)")
     parser.add_argument("--gap-secs", type=float, default=MIN_SEGMENT_SECS,
                         help="Max seconds between hits within a segment")
     args = parser.parse_args()
 
     videos = run_stage2(args.urls, output_dir=args.out)
     prefiltered = run_stage3(videos, person_count_min=args.min_persons)
-    scored = run_stage4(prefiltered, rpm=args.rpm)
-    segmented = run_stage6(scored, min_segment_secs=args.gap_secs)
+    scored = run_stage4(prefiltered, rpm=args.rpm, workers=args.workers)
+    segmented = run_stage6(scored, min_segment_secs=args.gap_secs,
+                           require_elevated=not args.any_vantage)
 
     for vs in segmented:
         print(f"\n{vs.video.title}")

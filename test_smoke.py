@@ -162,6 +162,101 @@ def test_score_clamp_and_sentinel():
     print(f"  stage4  threshold cutoff : boundary at {CROWD_THRESHOLD} OK")
 
 
+# ─── Stage 4 failure classification ──────────────────────────────────────────
+def test_terminal_error_classification():
+    """A spend cap must not be retried; a per-minute 429 must be."""
+    from stage4_gemini_score import _is_terminal
+
+    terminal = [
+        "429 RESOURCE_EXHAUSTED ... exceeded its monthly spending cap ...",
+        "400 API key not valid. Please pass a valid API key.",
+        "429 Quota exceeded for metric generate_content_requests per day",
+        "403 PERMISSION_DENIED",
+    ]
+    transient = [
+        "429 RESOURCE_EXHAUSTED ... quota metric ... per minute ...",
+        "503 Service Unavailable",
+        "500 Internal error",
+        "read operation timed out",
+    ]
+    for msg in terminal:
+        assert _is_terminal(Exception(msg)), f"should be terminal: {msg!r}"
+    for msg in transient:
+        assert not _is_terminal(Exception(msg)), f"should be retryable: {msg!r}"
+    print(f"  stage4  terminal vs retry: {len(terminal)}+{len(transient)} cases OK")
+
+
+# ─── Stage 4 concurrency ─────────────────────────────────────────────────────
+def test_concurrent_scoring():
+    """Workers must not change results; quota/errors must bank partial work."""
+    import json
+    import tempfile
+    import time
+
+    import stage4_gemini_score as s4
+    from stage2_download_prepare import VideoData
+    from stage3_prefilter import FrameScore, PrefilteredVideo
+
+    def make_pv(root: Path) -> PrefilteredVideo:
+        frames_dir = root / "vid" / "frames"
+        frames_dir.mkdir(parents=True)
+        video = VideoData(video_id="vid", url="https://x", title="T", duration=12,
+                          video_path=root / "vid" / "video.mp4", frames_dir=frames_dir)
+        frames = [FrameScore(path=frames_dir / f"{i:06d}.jpg", timestamp=float(i),
+                             person_count=0, passes_filter=True) for i in range(1, 13)]
+        return PrefilteredVideo(video=video, frame_scores=frames)
+
+    calls: list[str] = []
+
+    def fake(path, rpm):
+        calls.append(path.stem)
+        time.sleep(0.01)
+        if path.stem == "000005" and mode["fail"]:
+            raise mode["fail"]("boom")
+        return s4.CrowdScoreResponse(score=int(path.stem) % 10 + 1,
+                                     vantage=s4.CameraVantage.ELEVATED, reasoning="")
+
+    real_score, real_client = s4._score_frame, s4._get_client
+    s4._score_frame, s4._get_client = fake, lambda: None
+    mode = {"fail": None}
+    try:
+        outs = {}
+        for w in (1, 4):
+            with tempfile.TemporaryDirectory() as d:
+                sv = s4.score_video(make_pv(Path(d)), rpm=6000, workers=w)
+                outs[w] = [(s.frame.timestamp, s.crowd_score) for s in sv.gemini_scores]
+        assert outs[1] == outs[4], "workers changed the scores"
+        assert [t for t, _ in outs[4]] == sorted(t for t, _ in outs[4]), "not timestamp-ordered"
+        assert len(outs[4]) == 12
+
+        for exc_type, expect_none in ((s4.QuotaExhausted, False), (ValueError, True)):
+            mode["fail"] = exc_type
+            with tempfile.TemporaryDirectory() as d:
+                pv = make_pv(Path(d))
+                calls.clear()
+                raised = False
+                try:
+                    result = s4.score_video(pv, rpm=6000, workers=2, save_every=1)
+                except s4.QuotaExhausted:
+                    result, raised = None, True
+                assert raised != expect_none, f"{exc_type.__name__}: raised={raised}"
+                assert result is None
+                cache = json.loads((Path(d) / "vid" / "gemini_scores.json").read_text())
+                banked = len(cache["scores"])
+                # Frames 1-4 finish before frame 5 fails; a frame already in
+                # flight beside it may bank too, so only the bounds are fixed.
+                assert 4 <= banked < 12, f"banked {banked}"
+
+                # Resume: only the unbanked frames are scored again.
+                mode["fail"] = None
+                calls.clear()
+                sv = s4.score_video(pv, rpm=6000, workers=4)
+                assert len(calls) == 12 - banked and len(sv.gemini_scores) == 12
+    finally:
+        s4._score_frame, s4._get_client = real_score, real_client
+    print("  stage4  concurrency      : workers=1/4 parity, quota+error banking, resume OK")
+
+
 # ─── Runner ──────────────────────────────────────────────────────────────────
 def main() -> int:
     tests = [
@@ -172,6 +267,8 @@ def main() -> int:
         test_group_by_gap,
         test_composition_chain,
         test_score_clamp_and_sentinel,
+        test_terminal_error_classification,
+        test_concurrent_scoring,
     ]
     print(f"Running {len(tests)} smoke tests...\n")
     failed = 0
