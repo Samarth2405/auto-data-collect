@@ -110,6 +110,10 @@ What each part does:
 - Height words that work: `aerial`, `drone view`, `from above`, `top view`, `overhead`, `rooftop`, `from FOB`.
 - Hindi words often find local uploads: `bheed`, `भीड़`, `mela`, `yatra`, `visarjan`.
 - Avoid `walking tour`, `vlog`, and `POV`. These are almost always shot at ground level and get filtered out.
+- Prefer **raw drone footage** over **cinematic edits**. Words like `cinematic`, `4K edit`, `status` or `shorts`
+  usually mean fast cuts, title cards, cartoons and text overlays. The pipeline now cuts clips at every scene
+  change, so an edit still works, but it yields fewer and shorter clips. Words like `raw`, `full drone video`
+  and `live` find better sources.
 
 ### Choosing the location slug
 
@@ -126,11 +130,10 @@ ghat and chowk are skipped.
    `india-protest` (PRO), `india-roadshow` (ROA), `jaipur-johari-bazaar` (JOH),
    `kolkata-howrah-bridge` (HOW), `mathura-holi` (HOL), `mumbai-dadar-market` (DAD),
    `mumbai-railway-station` (RAI), `patna-chhath-puja` (CHH), `prayagraj-kumbh-mela` (KUM),
-   `varanasi-dashashwamedh-ghat` (DAS).
-2. **Run one prompt per location slug.** Numbering restarts at `0001` on every run, so a second, different
-   prompt with the same `--location` overwrites the first run's clips. If you want more videos for a place,
-   raise `--max-results` in that one run. Rerunning the *exact same* command is safe, because it picks up from
-   the cache.
+   `varanasi-dashashwamedh-ghat` (DAS), `puri-jagannath-rath-yatra` (JAG).
+2. **Several prompts for one place are fine.** Reuse the same `--out` and `--location` and new clips get
+   the next free numbers. Rerunning the same command is also safe: it picks up from the cache and replaces
+   that run's clips instead of duplicating them.
 
 ### How long it takes (free tier)
 
@@ -153,7 +156,7 @@ cd /d "%~dp0"
 call .venv\Scripts\activate.bat
 
 python stage1_search.py "Lalbaug Ganpati crowd aerial drone view" --max-results 5 --max-duration 300 --drop-ground --min-persons 0 --full-pipeline --out crowd_output_india\mumbai-lalbaug-ganpati --dataset dataset --location mumbai-lalbaug-ganpati
-python stage1_search.py "Puri Rath Yatra crowd aerial drone" --max-results 5 --max-duration 300 --drop-ground --min-persons 0 --full-pipeline --out crowd_output_india\puri-rath-yatra --dataset dataset --location puri-rath-yatra
+python stage1_search.py "Thrissur Pooram crowd aerial drone" --max-results 5 --max-duration 300 --drop-ground --min-persons 0 --full-pipeline --out crowd_output_india\thrissur-pooram --dataset dataset --location thrissur-pooram
 
 echo Done.
 pause
@@ -176,13 +179,43 @@ dataset/
 crowd_output_india/mumbai-lalbaug-ganpati/       working files (full videos, frames, caches): large
 ```
 
+Each clip is **one continuous shot**. The pipeline finds scene cuts and fades to black, and never lets a clip
+run across one. Moments shorter than 1.5 s are dropped.
+
 **Zero clips for a location** means no frame was both dense (Gemini score 7 or higher) and filmed from
-height. To see why, open `crowd_output_india/<slug>/results.json`. Then try a different prompt with a **new**
-slug.
+height. To see why, open `crowd_output_india/<slug>/results.json`. Then try a different prompt; you can keep
+the same slug.
+
+**How many people:** `crowd_count_avg` / `crowd_count_peak` are estimates from a crowd-counting model that runs on
+your computer.
+- **First run:** it downloads its 86 MB model once.
+- **Speed:** about 2 s per frame of clip on a normal laptop; much faster with an NVIDIA GPU.
+- **Accuracy:** roughly ±20%.
+- **Holi and colour powder:** these crowds come out far too low.
+- **Reviewing:** open `manifest.csv`, sort by `crowd_count_avg`, and look at the lowest clips first. They're usually
+  colour powder, or a shot with fewer people than it seemed.
+
+`person_count_avg` / `person_count_peak` come from a different detector that can't see people from above. They're near 0
+and are **not** a headcount; leave them as they are.
 
 Every clip has `"rights_cleared": false`. These are YouTube uploads, so don't publish or redistribute them.
 
-## 7. Sending your results back
+## 7. After a code update: re-export for free
+
+When you've been told the pipeline changed, get the new code and rebuild the clips you already have. This uses
+**no Gemini or YouTube quota**, because it reads the cached scores in `crowd_output_india/`:
+
+```powershell
+git pull
+.venv\Scripts\Activate.ps1
+python tune.py --out crowd_output_india/puri-jagannath-rath-yatra --dataset dataset --location puri-jagannath-rath-yatra
+```
+
+This also adds the people estimates to those clips. Run one `tune.py` line per location, with the same slug in `--out` and `--location`. It replaces that location's
+old clips in `dataset/`, including renumbering them, and leaves other locations alone.
+This only works while `crowd_output_india/<slug>/` still exists, which is another reason not to delete it.
+
+## 8. Sending your results back
 
 Zip the **`dataset`** folder and share it, for example on Google Drive. Don't send:
 

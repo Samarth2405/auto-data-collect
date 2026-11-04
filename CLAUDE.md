@@ -24,18 +24,19 @@ stage1_search.py             YouTube Data API v3 discovery → DiscoveredVideo
 stage2_download_prepare.py   yt-dlp + FFmpeg → VideoData
 stage3_prefilter.py          local YOLOv8n person counter → PrefilteredVideo
 stage4_gemini_score.py       Gemini 3.5 Flash scorer (density + camera vantage) → ScoredVideo
-stage6_segment_builder.py    gap-merge high-density frames → VideoSegments
+stage6_segment_builder.py    gap-merge high-density frames, split at scene cuts → VideoSegments
+stage7_crowd_count.py        local DM-Count density model: people per segment → CountedVideo
 stage8_output.py             batch JSON/CSV + optional FFmpeg clips + Getty-style dataset export
 discover_india.py            India-wide candidate discovery + tiering → candidates/india_candidates.json
 run_india_batch.py           runs the best tier-A candidates through stages 2..8, one location at a time
-tune.py                      re-segment from cache with new threshold/gap
+tune.py                      re-segment from cache with new threshold/gap; --dataset re-exports clips
 test_smoke.py                pure-function tests (no network, no API keys)
 requirements.txt             pinned dependencies
 .claude/commands/            /test-stage, /cost-estimate, /tune-threshold
 crowd_pipeline_v2_documentation.docx   reference architecture (not code)
 ```
 
-Stage 7 (enrichment) is deferred — see the "Deviations" section. Each stage is a standalone module with its own CLI (`python stageN_*.py --help`). Running `stageN` in the CLI implicitly runs stages 2..N-1 as prerequisites. `stage1_search.py --full-pipeline` runs everything from a search query in one command; `stage8_output.py` is the URL-based end-to-end entry point.
+The reference doc's Stage 7 (enrichment) is deferred; the Stage 7 slot here is a local crowd counter — see the "Deviations" section. Each stage is a standalone module with its own CLI (`python stageN_*.py --help`). Running `stageN` in the CLI implicitly runs stages 2..N-1 as prerequisites. `stage1_search.py --full-pipeline` runs everything from a search query in one command; `stage8_output.py` is the URL-based end-to-end entry point.
 
 ## Data Contract
 
@@ -48,6 +49,8 @@ DiscoveredVideo   (stage 1)  →  VideoData         (stage 2)  →  PrefilteredV
   duration_secs                  frame_paths                    .candidate_frames             .high_density_frames             .video (shortcut)
   view_count                     metadata                         (filtered subset)             (score >= CROWD_THRESHOLD)
 ```
+
+Stage 7 wraps it once more: `CountedVideo(.segmented: VideoSegments, .segment_counts)` exposes `.video/.segments/.scored`, so Stage 8 accepts either type.
 
 Stage 1 → Stage 2 handoff is just URL extraction: `[v.url for v in discovered]`. All other stages compose the previous output.
 
@@ -70,6 +73,8 @@ crowd_output/
     .stage2_done         sentinel: extraction completed cleanly
     prefilter.json       Stage 3 YOLO counts + threshold (invalidates on model/confidence change)
     gemini_scores.json   Stage 4 per-frame crowd score + reasoning (invalidates on model change)
+    shots.json           Stage 6 scene-cut candidates + black intervals (invalidates on SHOT_DETECT_PARAMS)
+    crowd_counts.json    Stage 7 estimated people per frame, segment frames only (invalidates on COUNT_MODEL/INPUT_SCALE)
     segments.json        Stage 6 merged time segments + yt_link deep-links
 ```
 
@@ -95,6 +100,9 @@ python stage1_search.py "Times Square crowd" --max-results 10
 # Iterate on threshold without re-running Gemini (free)
 python tune.py --threshold 8 --gap-secs 5
 
+# Re-export one location's dataset clips from cache under the current Stage 6/8 rules (free)
+python tune.py --out crowd_output_india/<slug> --dataset dataset --location <slug>
+
 # Verify pure-function correctness across all stages (no network)
 python test_smoke.py
 ```
@@ -115,6 +123,9 @@ python test_smoke.py
 | `FREE_TIER_RPM` | `15` | stage4 | Gemini requests per minute |
 | `DEFAULT_WORKERS` | `1` | stage4 | Concurrent Gemini calls (`--workers`); `--rpm` still caps the total. One sequential worker tops out near 30 RPM (~2 s/call) |
 | `MIN_SEGMENT_SECS` | `3.0` | stage6 | Max gap between hits before splitting a segment |
+| `COUNT_MODEL` | `DM-Count_QNRF` | stage7 | Crowd-count weights (86 MB, downloaded to gitignored `weights/` on first use); changing it invalidates `crowd_counts.json` |
+| `MIN_CLIP_SECS` | `1.5` | stage6 | Shorter segments are dropped (`--min-clip-secs`) — one sampled frame is too little evidence |
+| `SCENE_MIN_SCORE` / `SCENE_SPIKE_RATIO` | `0.2` / `2.5` | stage6 | A cut = FFmpeg scene score >= min AND >= ratio x neighbours' median. Re-derived from `shots.json`, so free to tune |
 
 ## Elevated-vantage collection
 
@@ -122,12 +133,19 @@ The India dataset keeps only crowds filmed from height. Stage 1 biases by metada
 
 **Use `--min-persons 0` for this work.** YOLOv8n cannot detect people from above, so the default pre-filter drops exactly the frames wanted. Stage 8 `--dataset DIR --location SLUG` writes `DIR/<location>/<vantage>/IND_<CODE>_NNNN/{clip.mp4,poster.jpg,metadata.json}` plus `DIR/manifest.csv`; `rights_cleared` is always `false`.
 
+**Segments never cross a scene cut.** Many sources are fast-cut montages. Stage 6 detects cuts and fades once per video (`shots.json`), splits segments at them, trims each segment to its shot, and drops anything under `MIN_CLIP_SECS`. Stage 8 re-encodes clips (H.264, CRF 20, capped at 2x source bitrate) so the cut is frame-exact; `-c copy` would start at the previous keyframe, usually the previous shot.
+
+**Re-exporting replaces.** Exporting a video again replaces that video's earlier assets at that location and deletes the superseded folders. New asset IDs continue from the highest number for that code in `manifest.csv`, so IDs never repeat across queries or across locations that share a code.
+
+**People counts come from Stage 7, not YOLO.** `crowd_count_avg/peak` (manifest, metadata, results) are DM-Count density estimates over every 1 fps frame in the clip: GPU ~0.1 s/frame, CPU ~2 s. They're good to about ±20%, and fail on colour powder (Holi, gulal), where they read under 100. `person_count_*` are kept as raw YOLO numbers for provenance and are near 0 from height. `--no-count` skips Stage 7.
+
 ## Deviations from `crowd_pipeline_v2_documentation.docx`
 
 The doc describes a cloud-native pipeline. This implementation trims it for zero-cost, local-first operation:
 
 - **Stage 3 replaced.** Video Intelligence API + Cloud Vision API → local YOLOv8n. Free-tier Cloud Vision caps at 1,000 units/month, which is exceeded within a few videos. YOLO runs unlimited on CPU.
 - **Stage 5 dropped.** Speech-to-Text is 60 min/month free — insufficient at any scale. Audio cues from YouTube captions (available via yt-dlp) can be substituted if needed for Stage 6.
+- **Stage 7 repurposed.** Enrichment (geocoding/NL) is deferred; the slot runs a local DM-Count crowd counter, because YOLO cannot count crowds from height.
 - **Stage 8 kept local.** JSON/CSV output only; BigQuery integration deferred.
 - **Gemini stays cloud.** Stage 4 is the sole paid dependency (and stays free under 15 RPM).
 

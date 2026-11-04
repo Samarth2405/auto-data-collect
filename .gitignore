@@ -19,3 +19,6 @@ crowd_output*/
 dataset/
 dataset-*/
 .venv/
+
+# Stage 7 crowd-counting weights (downloaded on first use, 86 MB)
+weights/

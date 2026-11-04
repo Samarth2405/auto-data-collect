@@ -112,8 +112,9 @@ This executes stages 1 → 8:
 2. Download each and extract 1 frame per second
 3. Local YOLO filters frames without at least 5 people
 4. Gemini scores each surviving frame 1–10 for crowd density
-5. Merge consecutive high-scoring frames into time segments
-6. Write `results.json` and `segments.csv` to `./crowd_output/`
+5. Merge consecutive high-scoring frames into time segments, never across a scene cut
+6. Estimate how many people each segment shows (local crowd-counting model)
+7. Write `results.json` and `segments.csv` to `./crowd_output/`
 
 The final output looks like:
 ```
@@ -174,6 +175,14 @@ python tune.py --threshold 8 --gap-secs 5
 ```
 
 No API calls made. Rewrites `results.json` from cached data.
+
+To also rebuild a location's dataset clips under the current Stage 6/8 rules, which is free, add `--dataset` and `--location`:
+
+```bash
+python tune.py --out crowd_output_india/puri-jagannath-rath-yatra --dataset dataset --location puri-jagannath-rath-yatra
+```
+
+This replaces that location's earlier clips for the same source videos; other locations are untouched.
 
 ### Change frame sampling rate
 
@@ -245,6 +254,18 @@ dataset/<location>/<vantage>/IND_<CODE>_NNNN/{clip.mp4, poster.jpg, metadata.jso
 
 Every `metadata.json` carries `"rights_cleared": false`. These are YouTube uploads; confirm licensing before redistributing.
 
+**Each clip is a single shot.** Many uploads are edited montages that cut every 1–3 s. Stage 6 detects scene cuts and fades to black with FFmpeg, once per video, cached in `shots.json`. Segments are split at those cuts and trimmed to their shot, and segments shorter than 1.5 s (`--min-clip-secs`) are dropped. Stage 8 re-encodes each clip to H.264 so it starts and ends exactly on the cut. Clips are bigger than stream copies of the AV1/VP9 source, but they play everywhere. Dissolves aren't detected, and nor are vantage changes within one continuous shot.
+
+**Exporting the same videos again replaces their clips**; it doesn't add duplicates. New IDs continue from the highest one in `manifest.csv`, so a second query for a location, or two locations whose 3-letter codes collide, never reuse an ID.
+
+**Estimated people per clip** (`crowd_count_avg`, `crowd_count_peak`) come from Stage 7, a local crowd-counting model. It's DM-Count, trained on very dense crowds, and it sums a density map over every frame in the clip. The first run downloads its weights into `weights/` (86 MB, once). After that it's about 0.1 s per frame on a GPU, 2 s on CPU, and cached in `crowd_counts.json`.
+- **Accuracy:** about ±20%. Read the numbers as estimates.
+- **Colour powder:** Holi and gulal crowds come out far too low, typically under 100.
+- **Reviewing:** sort `manifest.csv` by `crowd_count_avg`. The lowest clips are where the model and Gemini disagree, so check those first.
+- **Skipping:** `--no-count` turns counting off.
+
+`person_count_*` are raw YOLOv8n counts, kept for provenance. They're near zero for aerial frames and are **not** a headcount.
+
 **Searching all of India.** `discover_india.py` runs ~60 queries (festivals, protests, rallies, transit, markets…) with
 `regionCode=IN`, tiers the results (A = metadata signals both height and a crowd) and writes
 `candidates/india_candidates.json|csv`. Protest and rally queries are limited to the last 365 days. It costs
@@ -286,6 +307,8 @@ crowd_output/
    ├─ .stage2_done                 Stage 2 — sentinel: extraction succeeded
    ├─ prefilter.json               Stage 3 — YOLO person counts per frame
    ├─ gemini_scores.json           Stage 4 — Gemini score + reasoning per frame
+   ├─ shots.json                   Stage 6 — scene-cut candidates + black intervals
+   ├─ crowd_counts.json            Stage 7 — estimated people per frame (frames in segments)
    └─ segments.json                Stage 6 — merged time segments
 ```
 

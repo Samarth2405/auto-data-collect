@@ -53,6 +53,21 @@ def _extract_video_id(url: str) -> str | None:
     return m.group("id") if m else None
 
 
+def find_video_file(video_dir: Path) -> Path:
+    """The downloaded video, skipping yt-dlp's partial and per-format leftovers.
+
+    A bare glob("video.*") can pick video.f398.mp4.part from an interrupted
+    download. Falls back to video.mp4 (possibly absent) so callers can test .exists().
+    """
+    for ext in ("mp4", "mkv", "webm"):
+        if (video_dir / f"video.{ext}").exists():
+            return video_dir / f"video.{ext}"
+    for p in sorted(video_dir.glob("video.*")):
+        if p.suffix.lower() in (".mp4", ".mkv", ".webm"):
+            return p
+    return video_dir / "video.mp4"
+
+
 def _load_from_cache(video_dir: Path, url: str) -> VideoData | None:
     """Return VideoData if a *complete* prior extraction exists on disk."""
     done_marker = video_dir / ".stage2_done"
@@ -64,7 +79,7 @@ def _load_from_cache(video_dir: Path, url: str) -> VideoData | None:
         return None
     meta_path = video_dir / "metadata.json"
     metadata = json.loads(meta_path.read_text()) if meta_path.exists() else {}
-    video_path = next(video_dir.glob("video.*"), video_dir / "video.mp4")
+    video_path = find_video_file(video_dir)
     return VideoData(
         video_id=video_dir.name,
         url=url,

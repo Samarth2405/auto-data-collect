@@ -280,7 +280,11 @@ if __name__ == "__main__":
     parser.add_argument("--workers", type=int, default=1,
                         help="Concurrent Gemini calls (paid tier); --rpm still caps the total")
     parser.add_argument("--gap-secs", type=float, default=3.0, help="Stage 6 segment gap")
+    parser.add_argument("--min-clip-secs", type=float, default=1.5,
+                        help="Stage 6: drop segments shorter than this (0 keeps all)")
     parser.add_argument("--export-clips", action="store_true", help="Stage 8 clip export")
+    parser.add_argument("--no-count", action="store_true",
+                        help="Skip Stage 7 crowd counting (counts left blank)")
     parser.add_argument("--require-elevated", action="store_true",
                         help="Stage 1: keep only videos whose metadata names an elevated vantage")
     parser.add_argument("--drop-ground", action="store_true",
@@ -313,6 +317,7 @@ if __name__ == "__main__":
         from stage3_prefilter import run_stage3
         from stage4_gemini_score import run_stage4
         from stage6_segment_builder import run_stage6
+        from stage7_crowd_count import run_stage7
         from stage8_output import run_stage8
 
         urls = [v.url for v in videos]
@@ -320,8 +325,10 @@ if __name__ == "__main__":
         prefiltered = run_stage3(v_data, person_count_min=args.min_persons)
         scored = run_stage4(prefiltered, rpm=args.rpm, workers=args.workers)
         segmented = run_stage6(scored, min_segment_secs=args.gap_secs,
-                               require_elevated=not args.any_vantage)
-        outputs = run_stage8(segmented, output_dir=args.out,
+                               require_elevated=not args.any_vantage,
+                               min_clip_secs=args.min_clip_secs)
+        counted = run_stage7(segmented, enabled=not args.no_count)
+        outputs = run_stage8(counted, output_dir=args.out,
                              export_clips=args.export_clips,
                              dataset_dir=args.dataset or None,
                              location=args.location or None)

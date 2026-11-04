@@ -120,6 +120,158 @@ def test_group_by_gap():
     print("  stage6  group_by_gap     : 5 scenarios OK")
 
 
+def test_scene_cuts():
+    from stage6_segment_builder import _pick_cuts, _scene_candidates, _shot_boundaries
+
+    fps = 25
+    series = [(i / fps, 0.02) for i in range(250)]          # steady footage
+    series[50] = (2.0, 0.6)                                   # hard cut: one spike
+    for i in range(100, 125):                                 # fast pan: sustained
+        series[i] = (i / fps, 0.25)
+    for i in range(150, 180):                                 # 60 fps repeats: x, 0, x, 0
+        series[i] = (i / fps, 0.22 if i % 2 else 0.0)
+    series[200] = (8.0, 0.5)                                  # two cuts around a still
+    for i in range(201, 215):                                 # title card (repeats only)
+        series[i] = (i / fps, 0.0)
+    series[215] = (8.6, 0.45)
+    cands = _scene_candidates(series, window=2, floor=0.1, dup_floor=0.01)
+    assert _pick_cuts(cands) == [2.0, 8.0, 8.6], f"cuts: {_pick_cuts(cands)}"
+
+    # thresholds re-derive from the cached candidates; black edges are boundaries
+    assert _pick_cuts(cands, min_score=0.55) == [2.0]
+    assert _shot_boundaries({"candidates": cands, "black": [[9.0, 9.5]]}) == [2.0, 8.0, 8.6, 9.0, 9.5]
+    print("  stage6  scene cuts       : spike vs pan vs repeats vs still OK")
+
+
+def test_shot_aware_segments():
+    from stage3_prefilter import FrameScore
+    from stage4_gemini_score import GeminiScore
+    from stage6_segment_builder import _aggregate, _group_by_gap
+
+    def at(ts, score=8):
+        return GeminiScore(
+            frame=FrameScore(path=Path("."), timestamp=ts, person_count=0, passes_filter=True),
+            crowd_score=score, reasoning="", vantage="aerial",
+        )
+
+    hits = [at(10), at(11, 9), at(12), at(13), at(20)]
+    # no cuts: the old behaviour, one run [10..13] then [20]
+    assert [len(g) for g in _group_by_gap(hits, 3.0)] == [4, 1]
+
+    # cut at 11.2: frame 11 is sampled at 11.5, so it belongs to the next shot
+    groups = _group_by_gap(hits, 3.0, [11.2], fps=1.0)
+    assert [len(g) for g in groups] == [1, 3, 1], [len(g) for g in groups]
+    segs = [_aggregate(g, "https://youtu.be/x", 1.0, [11.2]) for g in groups]
+    # first ends at the cut, not at 11; second starts at the cut, not at 11
+    assert (segs[0].start, segs[0].end) == (10.0, 11.0)
+    assert (segs[1].start, segs[1].end) == (11.2, 14.0), (segs[1].start, segs[1].end)
+    assert segs[1].peak_timestamp == 11, "poster comes from the best hit"
+
+    # cut at 12.7 lands inside frame 12's window: the segment stops there
+    seg = _aggregate(_group_by_gap(hits[:3], 3.0, [12.7])[0], "", 1.0, [12.7])
+    assert (seg.start, seg.end) == (10.0, 12.7), (seg.start, seg.end)
+    print("  stage6  shot-aware split : split at cuts, trim to shot, peak frame OK")
+
+
+def test_dataset_reexport():
+    import csv
+    import tempfile
+    from stage2_download_prepare import VideoData
+    from stage3_prefilter import PrefilteredVideo
+    from stage4_gemini_score import ScoredVideo
+    from stage6_segment_builder import Segment, VideoSegments
+    from stage8_output import export_dataset
+
+    def vs(video_id, n_segs):
+        video = VideoData(video_id=video_id, url=f"https://youtu.be/{video_id}", title="t",
+                          duration=60, video_path=Path("missing.mp4"), frames_dir=Path("f"))
+        segs = [Segment(start=i * 10.0, end=i * 10.0 + 3, start_fmt="", end_fmt="",
+                        frame_count=3, avg_crowd_score=8, peak_crowd_score=8,
+                        person_count_avg=0, person_count_peak=0, yt_link="",
+                        vantage="aerial") for i in range(n_segs)]
+        return VideoSegments(scored=ScoredVideo(prefiltered=PrefilteredVideo(video=video)),
+                             segments=segs)
+
+    def manifest(root):
+        with open(root / "manifest.csv", newline="", encoding="utf-8") as f:
+            return [(r["asset_id"], r["location"], r["source_video_id"]) for r in csv.DictReader(f)]
+
+    import contextlib, io
+    with tempfile.TemporaryDirectory() as td, contextlib.redirect_stdout(io.StringIO()):
+        root = Path(td)
+        export_dataset([vs("A", 3)], td, "puri-rath-yatra")
+        export_dataset([vs("B", 2)], td, "puri-rath-yatra")        # second query, same place
+        export_dataset([vs("C", 1)], td, "kolkata-rath-yatra")     # different place, same code RAT
+        ids = [r[0] for r in manifest(root)]
+        assert ids == [f"IND_RAT_{i:04d}" for i in range(1, 7)], ids
+
+        export_dataset([vs("A", 1)], td, "puri-rath-yatra")        # re-segmented: 3 -> 1
+        rows = manifest(root)
+        assert sorted(r[2] for r in rows) == ["A", "B", "B", "C"], rows
+        assert len({r[0] for r in rows}) == len(rows), "IDs stay unique"
+        gone = root / "puri-rath-yatra" / "aerial" / "IND_RAT_0002"
+        assert not gone.exists(), "superseded asset folder removed"
+        assert (root / "kolkata-rath-yatra" / "aerial" / "IND_RAT_0006").is_dir()
+    print("  stage8  dataset re-export: no ID reuse, re-export replaces, stale dirs removed OK")
+
+
+def _segment(start, end, vantage="aerial"):
+    from stage6_segment_builder import Segment
+    return Segment(start=start, end=end, start_fmt="", end_fmt="", frame_count=0,
+                   avg_crowd_score=8, peak_crowd_score=8, person_count_avg=0,
+                   person_count_peak=0, yt_link="", vantage=vantage)
+
+
+def test_crowd_count_selection():
+    from stage2_download_prepare import VideoData
+    from stage7_crowd_count import _aggregate, _frames_by_segment
+
+    frames = [Path(f"f/{k:06d}.jpg") for k in range(1, 21)]        # stamped t = k - 1
+    video = VideoData(video_id="v", url="", title="", duration=20, video_path=Path("v.mp4"),
+                      frames_dir=Path("f"), frame_paths=frames, metadata={"fps_extracted": 1.0})
+    # [10, 13) holds frames stamped 10, 11, 12; [11.2, 14) was trimmed at a cut and
+    # holds 11, 12, 13 (sampled at t + 0.5, so 11 is inside, 10 is not)
+    sel = _frames_by_segment(video, [_segment(10, 13), _segment(11.2, 14)])
+    names = [[p.name for p in seg] for seg in sel]
+    assert names == [["000011.jpg", "000012.jpg", "000013.jpg"],
+                     ["000012.jpg", "000013.jpg", "000014.jpg"]], names
+
+    counts = {"000011.jpg": 100.4, "000012.jpg": 200.6, "000013.jpg": 299.4}
+    c = _aggregate(sel[0], counts)
+    assert (c.avg, c.peak, c.frames) == (200, 299, 3), c
+    assert _aggregate([Path("f/000099.jpg")], counts) is None, "no cached count -> None"
+    print("  stage7  count selection  : frames per segment, avg/peak OK")
+
+
+def test_counts_in_dataset():
+    import contextlib, csv, io, json, tempfile
+    from stage2_download_prepare import VideoData
+    from stage3_prefilter import PrefilteredVideo
+    from stage4_gemini_score import ScoredVideo
+    from stage6_segment_builder import VideoSegments
+    from stage7_crowd_count import CountedVideo, SegmentCount
+    from stage8_output import export_dataset
+
+    video = VideoData(video_id="A", url="https://youtu.be/A", title="t", duration=60,
+                      video_path=Path("missing.mp4"), frames_dir=Path("f"))
+    vs = VideoSegments(scored=ScoredVideo(prefiltered=PrefilteredVideo(video=video)),
+                       segments=[_segment(0, 3), _segment(10, 13)])
+    cv = CountedVideo(segmented=vs, segment_counts=[SegmentCount(812, 950, 3), None])
+    with tempfile.TemporaryDirectory() as td, contextlib.redirect_stdout(io.StringIO()):
+        export_dataset([cv], td, "puri-rath-yatra")
+        with open(Path(td) / "manifest.csv", newline="", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        assert [(r["crowd_count_avg"], r["crowd_count_peak"]) for r in rows] == \
+            [("812", "950"), ("", "")], rows
+        meta = json.loads((Path(td) / "puri-rath-yatra/aerial/IND_RAT_0001/metadata.json")
+                          .read_text(encoding="utf-8"))["measurements"]
+        assert meta["crowd_count_peak"] == 950 and "DM-Count" in meta["crowd_count_method"]
+        assert "YOLO" in meta["person_count_method"]
+        # a plain VideoSegments (counting skipped) still exports, with blank counts
+        export_dataset([vs], td, "puri-rath-yatra")
+    print("  stage8  crowd counts     : manifest + metadata fields, blank when skipped OK")
+
+
 # ─── Data contract chain ─────────────────────────────────────────────────────
 def test_composition_chain():
     """Verify VideoSegments.video walks scored ->prefiltered ->video shortcut."""
@@ -265,6 +417,11 @@ def main() -> int:
         test_fmt_time,
         test_yt_link,
         test_group_by_gap,
+        test_scene_cuts,
+        test_shot_aware_segments,
+        test_dataset_reexport,
+        test_crowd_count_selection,
+        test_counts_in_dataset,
         test_composition_chain,
         test_score_clamp_and_sentinel,
         test_terminal_error_classification,

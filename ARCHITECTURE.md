@@ -17,6 +17,7 @@ For installation and running, see [README.md](README.md).
   - [Stage 3: Local Pre-Filter](#stage-3-local-pre-filter)
   - [Stage 4: AI Crowd Scoring](#stage-4-ai-crowd-scoring)
   - [Stage 6: Segment Builder](#stage-6-segment-builder)
+  - [Stage 7: Crowd Count](#stage-7-crowd-count)
   - [Stage 8: Output & Analytics](#stage-8-output--analytics)
 - [Data Contract Chain](#data-contract-chain)
 - [Caching Strategy](#caching-strategy)
@@ -53,7 +54,8 @@ flowchart LR
     S2 -->|JPEG frames| S3[Stage 3<br/>YOLO Person Filter]
     S3 -->|Candidate frames| S4[Stage 4<br/>Gemini Scoring]
     S4 -->|Per-frame scores| S6[Stage 6<br/>Segment Merge]
-    S6 -->|Time segments| S8[Stage 8<br/>JSON + CSV + Clips]
+    S6 -->|Time segments| S7[Stage 7<br/>Crowd Count]
+    S7 -->|Segments + people estimates| S8[Stage 8<br/>JSON + CSV + Clips]
     S8 --> R([Downstream tools])
 
     style S3 fill:#e8f5e9
@@ -61,6 +63,7 @@ flowchart LR
     style S1 fill:#e3f2fd
     style S2 fill:#e3f2fd
     style S6 fill:#f3e5f5
+    style S7 fill:#e8f5e9
     style S8 fill:#f3e5f5
 ```
 
@@ -70,7 +73,7 @@ Colors:
 - 🟧 Orange — Gemini (the only intentional cloud dependency)
 - 🟪 Purple — pure Python computation
 
-Stages 5 and 7 from the reference doc are intentionally missing — see [Deviations](#deviations-from-the-reference-architecture).
+Stage 5 from the reference doc is intentionally missing. The Stage 7 slot here counts people; the reference doc's Stage 7 (enrichment) is deferred. See [Deviations](#deviations-from-the-reference-architecture).
 
 ---
 
@@ -308,6 +311,8 @@ prompt: "Rate the crowd density..." ──┼──▶ Gemini 3.5 Flash
 
 Merges consecutive high-density frames into time segments. A single high-score frame isn't useful; a range like "0:45 → 1:52 was densely packed" is.
 
+A segment never crosses a scene cut. Many uploads are edited montages with a cut every 1–3 s, and a 1 fps sample tells you nothing about the shot next to it. Before this rule, a clip could run from a drone shot into a ground-level close-up, a title card or a fade to black.
+
 #### How it works
 
 ```
@@ -326,26 +331,88 @@ Filter: crowd_score >= CROWD_THRESHOLD (default 7)
       │
       ▼
 Group where consecutive gap <= MIN_SEGMENT_SECS (default 3s)
+  AND no shot boundary between them (cuts + black intervals, shots.json)
       │
       ▼
 For each group: aggregate
-      ├─ start = first.timestamp
-      ├─ end   = last.timestamp + (1/fps)
+      ├─ start = max(first.timestamp, shot start)
+      ├─ end   = min(last.timestamp + (1/fps), shot end)
       ├─ avg / peak crowd_score
       ├─ avg / peak person_count
       ├─ yt_link = url + &t={start}s
-      └─ reasoning_samples[:3]
+      ├─ reasoning_samples[:3]
+      └─ peak_timestamp (best hit → Stage 8 poster)
+      │
+      ▼
+Drop segments shorter than MIN_CLIP_SECS (default 1.5s)
       │
       ▼
 segments.json
 ```
 
+**Shot detection** is one FFmpeg pass per video, about 2 s per minute of 720p: `blackdetect` plus the `select` filter's per-frame scene score, on a 320 px copy. The result is cached in `shots.json`.
+
+```
+scene score
+   0.6 |     #                     # #       cut = one-frame spike that is
+       |     #                     # #             >= SCENE_MIN_SCORE (0.2) AND
+   0.2 |     #   ##########        # #             >= 2.5 x median(neighbours)
+       |_____#___##########________#_#____
+       +-----------------------------------> time
+            cut   fast pan (no cut)  cuts around a still title card
+```
+
 #### Design choices
 
 - **Gap-inclusive grouping.** `gap <= MIN_SEGMENT_SECS` (not `<`). At 1 fps, this tolerates 2 dropped frames between hits — enough to bridge a YOLO or Gemini miss without smearing across a genuine low-density stretch.
-- **End extends by `1/fps`.** A hit at t=112 with fps=1 represents 112.0–113.0. Extending `end` gives ranges you can hand to a video editor without an off-by-one.
+- **End extends by `1/fps`.** A hit at t=112 with fps=1 represents 112.0–113.0. Extending `end` gives ranges you can hand to a video editor without an off-by-one. FFmpeg's `fps=1` filter actually samples the middle of that window (measured: t + 0.46–0.48 s), so a frame's shot is the one containing `t + 0.5/fps`.
+- **Cuts are spikes measured against their neighbours, not a fixed threshold.** A fast pan scores 0.2–0.3 for dozens of frames, while a cut spikes once. A fixed 0.3 threshold missed real cuts that scored 0.27 and would still flag pans in noisy footage. This is the idea behind PySceneDetect's AdaptiveDetector, done with FFmpeg so no dependency is added. Two details:
+  - The neighbour level is a **median**, so the cut into a still title card can't hide the cut out of it.
+  - It is taken over frames that **changed**: 60 fps uploads of 24/25 fps footage repeat frames, which score ~0 and would otherwise make every moving frame look like a spike.
+- **The ratio is 2.5, not PySceneDetect's 3.0.** A false cut only splits a good clip in two, while a missed cut leaves another shot inside it. Tuned on 17 local videos and the Puri montage clips.
+- **Dissolves and within-shot changes are not caught.** Crossfades never spike. An FPV drone that dips from rooftop height to head height without a cut stays one shot, and 1 fps scoring can't see a sub-second vantage change.
+- **`MIN_CLIP_SECS` drops one-frame flashes.** A single sampled frame is weak evidence: in montages these were archival stills and title cards that Gemini scored 8.
 - **`crowd_threshold` parameterized.** The default `CROWD_THRESHOLD` (imported from Stage 4) is overridable per call. This is what `tune.py` uses to try new thresholds against cached scores — no re-inference needed.
-- **No cache.** Segment building is deterministic and fast (milliseconds even for hundreds of frames). Rebuild on every call.
+- **Segments aren't cached; shots are.** Segment building is deterministic and fast (milliseconds), so it reruns every call. Shot detection decodes the whole video, so `shots.json` stores the raw candidates (time, score, neighbour median) and re-derives cuts from the current `SCENE_MIN_SCORE` / `SCENE_SPIKE_RATIO` at load time. `--ignore-cuts` (Stage 6, `tune.py`) restores the old behaviour.
+
+---
+
+### Stage 7: Crowd Count
+
+**File:** `stage7_crowd_count.py`
+**Input:** `list[VideoSegments]`
+**Output:** `list[CountedVideo]` — the same segments plus an estimated people count for each
+
+#### What it does
+
+Estimates how many people each segment shows. Stage 3's YOLO counts can't serve: a detector needs a mostly visible body, and from a drone a dense crowd is thousands of 5-pixel heads. YOLOv8n reports 0 for frames that hold over a thousand people.
+
+#### How it works
+
+```
+frames inside each segment (sample moment t + 0.5/fps in [start, end))
+      │
+      ▼
+DM-Count (VGG19 + density head, UCF-QNRF weights), native 1280 px input
+      │      density map: each pixel = expected people there; sum = count
+      ▼
+crowd_counts.json   {frame name: count}, keyed by model + input scale
+      │
+      ▼
+per segment: crowd_count_avg (mean over frames), crowd_count_peak (max frame)
+```
+
+#### Design choices
+
+- **Density regression, not detection.** This is the standard approach for dense crowds since 2016. The model is DM-Count (Wang et al., NeurIPS 2020, MIT) with weights from the LWCC project, built on the `torchvision` already installed for YOLO, so no new pip dependency. The 86 MB weights download once into `weights/`, which is gitignored, and load with `weights_only=True` because they come from the internet.
+- **UCF-QNRF weights over ShanghaiTech-A, at native size.** Tested on this project's aerial frames:
+  - QNRF's counts mostly held steady when frames were upscaled 1.5× and 2×; SHA's drifted.
+  - A hand-counted patch of about 20–30 people read 23 with QNRF; SHA reads about 40% lower.
+  - Upscaling moved QNRF's counts by -14% to +20% with no consistent direction, so native size is kept: it's the cheapest, and the numbers are good to about ±20%.
+- **Only frames inside segments.** That's what the dataset reports. It's roughly 0.1 s per frame on a GPU and 2 s on CPU (5 s for portrait frames), well under the 4 s per frame that Stage 4 already spends at 15 RPM.
+- **Cached per frame; aggregates re-derived.** As in Stages 3 and 4, the inference result is cached and invalidated on model or scale change, while avg/peak per segment are recomputed. Re-segmenting with `tune.py` only counts frames it hasn't seen.
+- **Known failure: colour powder.** Holi and gulal-heavy processions are outside the training data. Dense powdered crowds read 7–80. The same disagreement also exposes bad clips, such as frames that are a pink cloud with almost no visible people, which Gemini still scored 8. Sort `manifest.csv` by `crowd_count_avg` to review the lowest clips.
+- **Optional.** `--no-count` (Stages 1 and 8, `tune.py`) skips it. If the model can't load, for example with no network on the first weights download, the batch continues with blank counts.
 
 ---
 
@@ -374,14 +441,23 @@ list[VideoSegments]
         │
         ├──▶ segments.csv  (flat, one row per segment, pandas-ready)
         │
-        └──▶ (optional) clips/{video_id}_{start}-{end}.mp4
-                          via FFmpeg with -c copy (stream copy, no re-encode)
+        ├──▶ (optional) clips/{video_id}_{start}-{end}.mp4
+        │
+        └──▶ (optional, --dataset DIR --location SLUG)
+               DIR/<location>/<vantage>/IND_<CODE>_NNNN/{clip.mp4, poster.jpg, metadata.json}
+               DIR/manifest.csv
 ```
+
+Clips are re-encoded to H.264 (CRF 20, bitrate capped at 2× the source), cut frame-accurately.
 
 #### Design choices
 
 - **Two artifact formats.** JSON is nested and machine-readable; CSV is flat and spreadsheet-friendly. Different consumers, different formats.
-- **`-c copy` for clips.** Stream copy is ~50× faster than re-encoding. May snap the start ~1 keyframe (~2s) early. Drop `-c copy` for frame-accurate cuts if that ever matters.
+- **Re-encode, not `-c copy`.** Stream copy has to start at the previous keyframe, which in an edited upload is usually the previous shot. Most players hide that lead-in via the MP4 edit list, but the frames are still in the file. Now that segments end exactly on cuts, the cut must be exact. It costs ~1 s per clip.
+  - **Bitrate cap.** Plain CRF spent 3–6× YouTube's bitrate on reproducing its compression noise, so the bitrate is capped at 2× the source.
+  - **Codec trade-off.** Most downloads are AV1/VP9, which H.264 needs about twice the bits to match. In return, clips play everywhere: AV1-in-MP4 doesn't on stock Windows.
+- **Re-export replaces, IDs never repeat.** Exporting a video replaces that video's earlier assets at the same location, deleting the superseded folders. New IDs number on from the highest ID for that code already in `manifest.csv`. This covers rerunning a query, adding a second query for a location, and two locations sharing a 3-letter code (`delhi-railway-station` and `mumbai-railway-station` are both `RAI`). Before this change, numbering restarted at `0001` each run: clip folders were overwritten while the manifest kept the old rows.
+- **Poster = the segment's best qualifying hit.** Stage 6 records it in `peak_timestamp`. Previously it was the best-scoring frame anywhere in the time range, which could be a ground-level frame the vantage gate had rejected.
 - **`signal_sources: ["gemini", "yolo"]`.** Honest labeling of what actually contributed. Reference doc lists `["gemini", "video_intelligence", "audio"]`; we don't have those. When Stage 5 or 7 gets built, extend `SIGNAL_SOURCES` in one place.
 - **No caching.** Output artifacts overwrite every run. Tuning upstream should always produce fresh outputs.
 
@@ -426,6 +502,14 @@ VideoSegments            [Stage 6]
 ├─ .scored: ScoredVideo                 ◀── wraps
 ├─ .segments: list[Segment]                (merged time ranges)
 └─ .video (shortcut walks scored → prefiltered → video)
+
+    │
+    ▼
+
+CountedVideo             [Stage 7]
+├─ .segmented: VideoSegments            ◀── wraps
+├─ .segment_counts: list[SegmentCount | None]   (avg / peak people, aligned with segments)
+└─ .video / .segments / .scored (shortcuts, so Stage 8 takes either type)
 ```
 
 ### Why composition, not inheritance
@@ -468,13 +552,15 @@ flowchart TD
 | `.stage2_done` + `frames/` | absent = re-run | — |
 | `prefilter.json` | `YOLO_CONFIDENCE`, `YOLO_MODEL` change | `passes_filter` from current `PERSON_COUNT_MIN` |
 | `gemini_scores.json` | frame path added/removed | `is_high_density` from current `CROWD_THRESHOLD` |
-| `segments.json` | never — always recomputed | (fully derived from `gemini_scores.json`) |
+| `crowd_counts.json` | `COUNT_MODEL`, `INPUT_SCALE` change | per-segment avg / peak from current segments |
+| `shots.json` | `SHOT_DETECT_PARAMS` change | cut times from current `SCENE_MIN_SCORE`, `SCENE_SPIKE_RATIO` |
+| `segments.json` | never — always recomputed | (fully derived from `gemini_scores.json` + `shots.json`) |
 
 ### What this buys us
 
 Tuning `PERSON_COUNT_MIN` or `CROWD_THRESHOLD` is **free** — no re-inference, no Gemini calls. Only `YOLO_CONFIDENCE` or `YOLO_MODEL` force re-inference at Stage 3; only clearing `gemini_scores.json` forces re-scoring at Stage 4.
 
-This is what `tune.py` (and the `/tune-threshold` slash command) exploit — they load cached Gemini scores, re-run Stage 6 and Stage 8 with new parameters, and produce fresh `results.json` in seconds without touching the network.
+This is what `tune.py` (and the `/tune-threshold` slash command) exploit. They load cached Gemini scores, re-run Stage 6 and Stage 8 with new parameters, and produce a fresh `results.json` in seconds without touching the network. With `--dataset DIR --location SLUG`, `tune.py` also re-exports that location's dataset clips under the current rules.
 
 ---
 
@@ -505,7 +591,7 @@ Red = removed / replaced. Green = local substitute.
 |-------|-----------|--------|--------|
 | 3 | Video Intelligence + Cloud Vision | **Local YOLOv8n** | Cloud Vision free tier caps at 1K units/month — exceeded within ~5 videos. YOLO runs unlimited on CPU. |
 | 5 | Speech-to-Text + captions | **Dropped** (default off in reference too) | STT free tier is 60 min/month — insufficient at any scale. Crowd audio cues add little signal that visual scoring doesn't already catch. |
-| 7 | Geocoding + Natural Language | **Deferred** (placeholder fields in JSON) | Not core to crowd detection. Can be added later without touching upstream. |
+| 7 | Geocoding + Natural Language | **Deferred** (placeholder fields in JSON). The Stage 7 slot instead holds a **local crowd counter** (DM-Count) | Enrichment isn't core to crowd detection. A people estimate is, and YOLO can't provide one from height. |
 | 8 | BigQuery + Looker Studio | **Local JSON + CSV** | Zero infrastructure. Pandas/DuckDB can query the same data. |
 
 **Only Stage 4 (Gemini) is a paid dependency** — and it stays free at 15 RPM.
@@ -513,7 +599,7 @@ Red = removed / replaced. Green = local substitute.
 ### If you want to add back the removed stages
 
 - **Stage 5 (audio)** — extend `SIGNAL_SOURCES` in `stage8_output.py`, add a stage5 module that reads YouTube captions via yt-dlp (free) or STT (paid). Add `audio_cues` field to `Segment` in Stage 6.
-- **Stage 7 (enrichment)** — populate `metadata["location"]` and `metadata["entities"]` in a new stage7 module. Stage 8 already reads these fields and emits them in `results.json`.
+- **Enrichment (reference Stage 7)** — populate `metadata["location"]` and `metadata["entities"]` in a new module between Stage 7 and Stage 8. Stage 8 already reads these fields and emits them in `results.json`.
 
 The composition pattern means neither addition requires changes to existing stages.
 
@@ -532,6 +618,8 @@ Stage 4        ~40 calls @ 15 RPM    ~40 calls @ 60 RPM
                 = 3 min wait          = 40 sec wait
                 = $0                  = ~$0.04
 Stage 6        (local, free)         (local, free)
+Stage 7        (local, free)         (local, free)
+                ~2 s/frame CPU, 0.1 s GPU, segment frames only
 Stage 8        (local, free)         (local, free)
 ─────────────────────────────────────────────────────
 Total          3 min, $0             1 min, $0.04
